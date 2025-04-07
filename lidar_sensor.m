@@ -20,7 +20,3 @@ end
 %% preprocessing: denoise, downsample, ground segmentation
 
 ptCloudProcessed = functions.preprocessing(ptcloud);
-
-lidarViewer
-
-labels = segmentLidarData(ptCloudProcessed,5);
