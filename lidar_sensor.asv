@@ -1,0 +1,41 @@
+
+%% setup
+clc
+clear
+close all
+%% import data (.pcd)
+ptcloud = importPointCloud('/Users/cristiansacco/Tesi/pcd/PointCloudTest',47);
+% aggiungo cartella, poi scelgo il file .pcd che voglio
+% folderPath = '/Users/cristiansacco/Tesi/pcd/PointCloudTest';
+% files = dir(fullfile(folderPath, '*.pcd'));
+
+%% load workspace
+load("workspace.mat")
+%% rappresentazione pcd
+% index = 47; % buon file con macchine davanti e dietro
+% filePath = fullfile(folderPath, files(index).name);
+% %figure;
+% ptCloud = pcread(filePath);
+% pcshow(ptCloud,"ColorSource","Intensity");
+% title('File pcd grezzo')
+%% Tools utili
+% lidarViewer
+%lidarLabeler
+%% preprocessing: denoise, downsample, ground segmentation
+% --- Denoise ---
+pcdDenoise = pcdenoise(ptCloud,"Threshold",0.75);
+% pcshow(pcdDenoise,"ColorSource","Intensity");
+% title('Denoise')
+
+% --- Downsample ---
+ptCloudDownSampled = pcdownsample(pcdDenoise,"random",0.75);
+% pcshow(ptCloudDownSampled,"ColorSource","Intensity");
+% title('Downsampled')
+
+% --- Ground Segmentation ---
+[groundPtsIdx,nonGroundPtCloud,groundPtCloud] = segmentGroundSMRF(ptCloudDownSampled,2,"ElevationThreshold",0.1);
+
+pcshow(nonGroundPtCloud,"ColorSource","Intensity");
+title ('Point Cloud - No Ground')
+
+lidarViewer
