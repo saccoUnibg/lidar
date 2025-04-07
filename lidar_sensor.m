@@ -3,6 +3,7 @@
 clc
 clear
 close all
+
 %% Tools
 % lidarViewer
 % lidarLabeler
@@ -11,13 +12,15 @@ close all
 import = 0;
 
 if import == 0
-    ptcloud = importPointCloud('/Users/cristiansacco/Tesi/pcd/PointCloudTest',47);
+    ptcloud = functions.importPointCloud('/Users/cristiansacco/Tesi/pcd/PointCloudTest',47);
 else
     load("workspace.mat")
 end
 
 %% preprocessing: denoise, downsample, ground segmentation
 
-ptCloudProcessed = preprocessing(ptcloud);
+ptCloudProcessed = functions.preprocessing(ptcloud);
 
 lidarViewer
+
+labels = segmentLidarData(ptCloudProcessed,5);

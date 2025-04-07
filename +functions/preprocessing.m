@@ -14,6 +14,6 @@ ptCloudDownSampled = pcdownsample(ptCloudDenoise,"random",0.75);
 [~,ptCloudProcessed,~] = segmentGroundSMRF(ptCloudDownSampled,2,"ElevationThreshold",0.1);
 
 pcshow(ptCloudProcessed,"ColorSource","Intensity");
-title ('Point Cloud - No Ground')
+title ('Processed Point Cloud - Ground removed')
 end
 
