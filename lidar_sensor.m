@@ -31,6 +31,6 @@ ptCloudDownSampled = pcdownsample(pcdDenoise,"random",0.75);
 % --- Ground Segmentation ---
 [groundPtsIdx,nonGroundPtCloud,groundPtCloud] = segmentGroundSMRF(ptCloudDownSampled,2,"ElevationThreshold",0.1);
 
-pcshow(nonGroundPtCloud);
-title ('Ground')
+pcshow(nonGroundPtCloud,"ColorSource","Intensity");
+title ('Point Cloud - No Ground')
 
