@@ -18,20 +18,19 @@ ptCloud = pcread(filePath);
 % lidarViewer
 %lidarLabeler
 %% preprocessing: denoise, downsample, ground segmentation
-% Denoise
+% --- Denoise ---
 pcdDenoise = pcdenoise(ptCloud,"Threshold",0.75);
 % pcshow(pcdDenoise,"ColorSource","Intensity");
 % title('Denoise')
 
-% Downsample
+% --- Downsample ---
 ptCloudDownSampled = pcdownsample(pcdDenoise,"random",0.75);
 % pcshow(ptCloudDownSampled,"ColorSource","Intensity");
 % title('Downsampled')
 
-% Ground Segmentation: 
+% --- Ground Segmentation ---
+[groundPtsIdx,nonGroundPtCloud,groundPtCloud] = segmentGroundSMRF(ptCloudDownSampled,2,"ElevationThreshold",0.1);
 
-groundPtsIdx = segmentGroundSMRF(ptCloudDownSampled,2,"ElevationThreshold",0.1);
-
-groundPtCloud = select(ptCloudDownSampled,groundPtsIdx);
-pcshowpair(ptCloudDownSampled,groundPtCloud)
+pcshow(nonGroundPtCloud);
 title ('Ground')
+
