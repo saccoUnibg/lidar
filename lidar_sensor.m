@@ -9,6 +9,12 @@ close all
 % lidarLabeler
 
 %% import data or load workspace (same .pcd)
+
+%{
+    Field "Import":
+    0 -> import from file explorer
+    1 -> import from workspace
+%}
 import = 0;
 
 if import == 0
