@@ -1,0 +1,45 @@
+
+%% setup
+clc
+clear
+close all
+
+%% Tools
+% lidarViewer
+% lidarLabeler
+
+%% 1. import data or load workspace (same .pcd)
+
+%{ 
+    Field "Import":
+    0: import from file explorer  |||     1: import from workspace
+%}
+import = 0;
+
+if import == 0
+    ptCloud = functions.importPointCloud('/Users/cristiansacco/Tesi/1_files_pcd/test01',110);
+else
+    load("workspace.mat")
+end
+% pcshow(ptCloud,"ColorSource","Intensity")
+%% 2. preprocessing
+values = PreprocessingValues(30,0.75,0.75,0.1);
+
+
+
+%clean point cloud: delete null rows, max_distance applied
+ptCloudClean = functions.cleanPointCloud(ptCloud,values.max_distance);
+
+%denoise, downsample, ground segmentation
+ptCloudProcessed = functions.preprocessing(ptCloudClean);
+
+pcshow(ptCloudClean,"ColorSource","Intensity");
+
+%% 3. PointPillars model
+pretrainedDetector = load("pretrainedPointPillarsDetector.mat","detector");
+detector = pretrainedDetector.detector;
+
+results = detect(detector,ptCloudProcessed);
+detector.ClassNames
+% problema: https://it.mathworks.com/help/lidar/ug/object-detection-using-pointpillars-network.html
+% qua è scritto che allenano solo su car e truck

@@ -6,7 +6,7 @@ files = dir(fullfile(folderPath, '*.pcd'));
 
 filePath = fullfile(folderPath, files(pcd_index).name);
 ptCloud = pcread(filePath);
-pcshow(ptCloud,"ColorSource","Intensity")
-title('Imported Point Cloud')
+% pcshow(ptCloud,"ColorSource","Intensity")
+% title('Imported Point Cloud')
 end
 
