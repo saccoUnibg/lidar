@@ -1,4 +1,4 @@
-classdef PreprocessingValues 
+classdef PreprocessingModel 
     properties
         max_distance
         denoise_threshold
@@ -16,7 +16,7 @@ classdef PreprocessingValues
             obj.elevation_threshold = elevation_threshold;
         end
 
-        function obj = PreprocessingValues()
+        function obj = PreprocessingModel()
         end
     end
 end
