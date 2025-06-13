@@ -1,30 +1,37 @@
 
-%% setup
+%% Setup iniziale
 clc
 clear
-close all
+close all 
 cd('/Users/cristiansacco/workspaces/lidar')
-%% Tools
+%% Tools & functions
 % lidarViewer
 % lidarLabeler
 % openExample('deeplearning_shared/Lidar3DObjectDetectionUsingPointPillarsExample')
-%% 1. import data or load workspace (same .pcd)
 
-ptCloud = functions.importPointCloud('/Users/cristiansacco/Tesi/1_files_pcd/test01',110);
-% ptCloud = functions.importPointCloud('/Users/cristiansacco/Tesi/1_files_pcd/PointCloudTest',40);
-% ptCloud = pcread("ptCloudRot.pcd")
-% pcshow(ptCloud,"ColorSource","Intensity")
-%% 2. preprocessing
-% values = models.PreprocessingValues(30,0.75,0.75,0.1);
-values = models.PreprocessingModel();
-values.max_distance = 25;
-values.denoise_threshold = 0.75;
-values.downsample_threshold = 0.75;
-values.elevation_threshold = 0.1;
+% functions.show        -> mostra la nuvola di punti
+% function.showVisible ->
+%% 1. Import data or load workspace (same .pcd)
 
-ptCloudProcessed = functions.preprocessingFunction(ptCloud,values);
+ ptCloud = functions.importPointCloud('/Users/cristiansacco/Tesi/1_files_pcd/test01',110);
+ functions.show(ptCloud)
+ title("ptCloud")
+%% 2. Preprocessing
+% - rimozione righe nulle
+% - rimozione punti oltre "max_distance" m
+% - denoise
+% - downsample
+% - ground segmentation
 
-%% 
+ptCloudProcessed = functions.preprocessingFunction(ptCloud,25,0.75,0.75,0.1);
+
+functions.show(ptCloudProcessed)
+title("ptCloudProcessed")
+
+% I valori non sono congrui al modello; necessita sicuramente una rotazione
+%% 3. Rotazione PointCloud per PointPillars Model
+%   xmin    xmax    ymin    ymax    zmin    zmax     
+%   0	    69.12	-39.68  39.68	-5	    5
 
 theta = deg2rad(180);  % ad esempio ruota di 90° in senso antiorario
 R = [cos(theta) -sin(theta) 0;
@@ -32,22 +39,32 @@ R = [cos(theta) -sin(theta) 0;
      0           0          1];
 
 rotatedXYZ = (R * ptCloudProcessed.Location')';
-ptCloudRot = pointCloud(rotatedXYZ, 'Intensity', ptCloudProcessed.Intensity);
+ptCloudRotated = pointCloud(rotatedXYZ, 'Intensity', ptCloudProcessed.Intensity);
 
-pcshow(ptCloudRot,"ColorSource","Intensity");
+functions.show(ptCloudRotated);
+title ("ptCloudRotated")
 
-ptCloudVisible = functions.ptCloudVisible(ptCloudRot);
-pcshow(ptCloudVisible,"ColorSource","Intensity")
-
-%% 3. PointPillars model
+%% 3. PointPillars model import
 
 pretrainedDetector = load("pretrainedPointPillarsDetector.mat","detector");
 detector = pretrainedDetector.detector;
+disp(detector.PointCloudRange)
 colors = {'green','magenta'};
-% ptCloudOrganized = functions.pcOrganization(ptCloudProcessed);
 
-results = detect(detector,ptCloudRot);
-[bboxes, scores, labels] = detect(detector, ptCloudRot);
-detector.ClassNames;
+%% model on Point Cloud
+results = detect(detector,ptCloudRotated);
+[bboxes, scores, labels] = detect(detector, ptCloudRotated);figure;
 
-functions.showPointCloudWith3DBoxes(ptCloudRot,bboxes,labels,detector.ClassNames,colors);
+% functions.showPointCloudWith3DBoxes(ptCloudRotated,bboxes,labels,detector.ClassNames,colors);
+
+functions.show(ptCloudRotated);            % mostra la nuvola
+axis on; grid on;
+xlabel('X'); ylabel('Y'); zlabel('Z');
+view(3);                    % vista 3D
+
+% Sovrapponi le bounding box
+hold on;
+showShape("cuboid", bboxes, ...
+          "Label", labels, ...
+          "Color", "g", ...
+          "LineWidth", 1.5);

@@ -1,0 +1,66 @@
+
+%% Setup iniziale
+clc
+clear
+% close all 
+cd('/Users/cristiansacco/workspaces/lidar')
+%% Tools
+% lidarViewer
+% lidarLabeler
+% openExample('deeplearning_shared/Lidar3DObjectDetectionUsingPointPillarsExample')
+%% 1. Import data or load workspace (same .pcd)
+
+ ptCloud = functions.importPointCloud('/Users/cristiansacco/Tesi/1_files_pcd/test01',110);
+ functions.show(ptCloud)
+%% 2. Preprocessing
+% - rimozione righe nulle
+% - rimozione punti oltre "max_distance" m
+% - denoise
+% - downsample
+% - ground segmentation
+
+ptCloudProcessed = functions.preprocessingFunction(ptCloud,25,0.75,0.75,0.1);
+functions.show(ptCloudProcessed)
+functions.showVisible(ptCloudProcessed);
+
+%% Check punti 
+
+%% 3. Rotazione PointCloud per PointPillars Model
+
+theta = deg2rad(180);  % ad esempio ruota di 90° in senso antiorario
+R = [cos(theta) -sin(theta) 0;
+     sin(theta)  cos(theta) 0;
+     0           0          1];
+
+rotatedXYZ = (R * ptCloudProcessed.Location')';
+ptCloudRotated = pointCloud(rotatedXYZ, 'Intensity', ptCloudProcessed.Intensity);
+functions.showVisible(ptCloudRotated);
+
+
+
+%% Mostra risultati ottenuti
+figure
+pcshow(ptCloudProcessed,"ColorSource","Intensity");
+title("processed")
+figure
+pcshow(ptCloudRotated,"ColorSource","Intensity");
+title("rotated")
+figure
+pcshow(ptCloudVisible,"ColorSource","Intensity");
+title("visible")
+
+%% 3. PointPillars model
+
+pretrainedDetector = load("pretrainedPointPillarsDetector.mat","detector");
+detector = pretrainedDetector.detector;
+colors = {'green','magenta'};
+% ptCloudOrganized = functions.pcOrganization(ptCloudProcessed);
+
+net = load('pointpillarsKittiNet.mat');
+
+results = detect(detector,ptCloudRotated);
+[bboxes, scores, labels] = detect(detector, ptCloudRotated);
+detector.ClassNames;
+
+%% pcshow
+functions.show(ptCloud)

@@ -1,4 +1,4 @@
-function showPointCloudWith3DBoxes(ptCld,bboxes,labels,classNames,colors)
+function showPointCloudWith3DBoxes(ptCloud,bboxes,labels,classNames,colors)
     % Validate the length of classNames and colors are the same
     assert(numel(classNames) == numel(colors), 'ClassNames and Colors must have the same number of elements.');
     
@@ -14,8 +14,7 @@ function showPointCloudWith3DBoxes(ptCld,bboxes,labels,classNames,colors)
         labelColor{i} = colorMap(char(labels(i)));
     end
 
-    figure;
-    ax = pcshow(ptCld,"ColorSource","Intensity"); 
+    ax = pcshow(ptCloud,"ColorSource","Intensity");
     showShape('cuboid', bboxes, 'Parent', ax, 'Opacity', 0.1, ...
         'Color', labelColor, 'LineWidth', 0.5);
     zoom(ax,1.5);

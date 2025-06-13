@@ -1,8 +1,7 @@
-function [ptCloudProcessed] = preprocessingFunction(ptCloud,values)
+function [ptCloudProcessed] = preprocessingFunction(ptCloud,max_distance,denoise_threshold,downsample_threshold,elevation_threshold)
     
-ptCloudProcessed = cleanPointCloud(ptCloud,values.max_distance);
-ptCloudProcessed = preprocessing(ptCloudProcessed,values);
-    
+ptCloudProcessed = cleanPointCloud(ptCloud,max_distance);
+ptCloudProcessed = preprocessing(ptCloudProcessed,denoise_threshold,downsample_threshold,elevation_threshold);  
 end
 % -------------------------------------------------------------------------
 
@@ -25,7 +24,7 @@ function [ptCloudClean] = cleanPointCloud(ptCloud,max_distance)
     % Calcola la distanza euclidea da origine (0,0,0)
     dist = sqrt(sum(pts.^2, 2));
 
-    % Mantiene solo i punti entro 50 metri
+    % Mantiene solo i punti entro "max_distance" metri
     valid = valid & (dist <= max_distance);
 
     % Applica i filtri ai punti
@@ -40,27 +39,16 @@ function [ptCloudClean] = cleanPointCloud(ptCloud,max_distance)
     end
 end
 
-
 % -------------------------------------------------------------------------
 
-function [ptCloudProcessed] = preprocessing(ptCloud,values)
+function [ptCloudProcessed] = preprocessing(ptCloud,denoise_threshold,downsample_threshold,elevation_threshold)
 %PREPROCESSING Summary of this function goes here
 % --- Denoise ---
-ptCloudDenoise = pcdenoise(ptCloud,"Threshold",values.denoise_threshold);
-% pcshow(pcdDenoise,"ColorSource","Intensity");
-% title('Denoise')
-
+ptCloudDenoise = pcdenoise(ptCloud,"Threshold",denoise_threshold);
 % --- Downsample ---
-ptCloudDownSampled = pcdownsample(ptCloudDenoise,"random",values.downsample_threshold);
-% pcshow(ptCloudDownSampled,"ColorSource","Intensity");
-% title('Downsampled')
-
+ptCloudDownSampled = pcdownsample(ptCloudDenoise,"random",downsample_threshold);
 % --- Ground Segmentation ---
-[~,ptCloudProcessed,~] = segmentGroundSMRF(ptCloudDownSampled,2,"ElevationThreshold",values.elevation_threshold);
-
-% pcshow(ptCloudProcessed,"ColorSource","Intensity");
-% title ('Processed Point Cloud - Ground removed')
-
+[~,ptCloudProcessed,~] = segmentGroundSMRF(ptCloudDownSampled,2,"ElevationThreshold",elevation_threshold);
 end
 
 % -------------------------------------------------------------------------

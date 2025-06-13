@@ -1,4 +1,4 @@
-function [ptCloudSeen] = ptCloudVisible(ptCloudProcessed)
+function showVisible(ptCloudProcessed)
     xyz = ptCloudProcessed.Location;
     intensity = ptCloudProcessed.Intensity;
 
@@ -8,7 +8,7 @@ function [ptCloudSeen] = ptCloudVisible(ptCloudProcessed)
     xyz(:,3) >= -5 & xyz(:,3) <= 5;
 
     ptCloudSeen = pointCloud(xyz(inRange, :), 'Intensity', intensity(inRange));
-    
+    functions.show(ptCloudSeen)
 end
 
 
