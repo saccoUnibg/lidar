@@ -1,0 +1,66 @@
+
+%% 0. Setup iniziale
+clc
+clear
+close all
+cd('/Users/cristiansacco/workspaces/lidar')
+%% Tools, examples and functions
+% -- TOOLS --
+% lidarViewer
+% lidarLabeler
+% deepNetworkDesigner
+% lidarLabeler('gTruth.mat')
+% ------------
+% -- EXAMPLES --
+% openExample('deeplearning_shared/Lidar3DObjectDetectionUsingPointPillarsExample')
+% ------------
+% -- FUNCTIONS --
+% functions.show        -> mostra la nuvola di punti
+% function.showVisible ->  mostra nuvola di punti che il modello è in grado di analizzare
+%% 1. ptCloud: Import data or load workspace (same .pcd)
+%  2. ptCloudProcessed: import and Preprocessing
+
+% - rimozione righe nulle
+% - rimozione punti oltre "max_distance"
+% - denoise
+% - downsample
+% - ground segmentation
+ ptCloud = functions.importPointCloud('/Users/cristiansacco/Tesi/1_files_pcd/test07cropped',085);
+ ptCloudProcessed = functions.preprocessingFunction(ptCloud,25,0.75,0.75,0.1);
+
+%% 3. ptCloudRotated: Rotazione PointCloud per PointPillars Model
+%   xmin    xmax    ||ymin    ymax   ||zmin   zmax     
+%   0       69.12   ||-39.68  39.68  ||-5	    5
+
+theta = deg2rad(180);  % ad esempio ruota di 90° in senso antiorario
+R = [cos(theta) -sin(theta) 0;
+     sin(theta)  cos(theta) 0;
+     0           0          1];
+
+rotatedXYZ = (R * ptCloudProcessed.Location')';
+ptCloudRotated = pointCloud(rotatedXYZ, 'Intensity', ptCloudProcessed.Intensity);
+%% Show ptClouds
+
+ functions.show(ptCloud,"ptCloud");
+
+ functions.show(ptCloudProcessed,"ptCloudProcessed");
+
+ functions.show(ptCloudRotated,"ptCloudRotated");
+
+
+%% 6. result: apply model on Point Cloud
+
+results = detect(newDetector,ptCloudProcessed);
+[bboxes, scores, labels] = detect(newDetector, ptCloudProcessed);
+
+functions.show(ptCloudProcessed,"bounding boxes - Cyclists");% mostra la nuvola
+axis on; grid on;
+xlabel('X'); ylabel('Y'); zlabel('Z');
+view(3);    % vista 3D
+
+% Sovrapponi le bounding box
+hold on;
+showShape("cuboid", bboxes, ...
+          "Label", labels, ...
+          "Color", "g", ...
+          "LineWidth", 1.5);
