@@ -4,16 +4,61 @@ clear
 close all
 cd('/Users/cristiansacco/workspaces/lidar')
 
-%% import pcd
-lidarLabeler
-
-load("Untitled.mat")
 %% PointPillars model import
 pretrainedDetector = load("pretrainedPointPillarsDetector.mat","detector");
 detector = pretrainedDetector.detector;
 fprintf('Range coordinate del modello:\n')
 disp(detector.PointCloudRange)
 
+%% trainingData
+load('gTruth.mat');
+
+% 1. Trova tutti i file .pcd
+folderPCD = gTruth.DataSource.SourceName;
+filesStruct = dir(fullfile(folderPCD, '*.pcd'));
+pcdFiles = sort(fullfile({filesStruct.folder}, {filesStruct.name})');
+
+% 2. Verifica coerenza
+assert(height(gTruth.LabelData) == numel(pcdFiles), ...
+    'Mismatch tra .pcd e gTruth');
+
+% 3. Preparazione
+N = numel(pcdFiles);
+labelNames = gTruth.LabelDefinitions.Name;  % es. {'Cyclist'}
+labelTable = gTruth.LabelData;
+
+% 4. Inizializza contenitori
+validFileNames = {};
+labelColumns = cell(1, numel(labelNames));  % una cella per colonna
+
+% 5. Loop per costruire righe valide (con almeno 1 bounding box)
+for i = 1:N
+    hasBox = false;
+    tempBoxes = cell(1, numel(labelNames));
+
+    for k = 1:numel(labelNames)
+        boxK = labelTable{i, labelNames{k}}{1};  % Mx9 matrix
+        tempBoxes{k} = boxK;
+        if ~isempty(boxK)
+            hasBox = true;
+        end
+    end
+
+    if hasBox
+        validFileNames{end+1,1} = pcdFiles{i};
+        for k = 1:numel(labelNames)
+            labelColumns{k}{end+1,1} = tempBoxes{k};
+        end
+    end
+end
+
+% 6. Costruzione della tabella finale
+labelData = table(validFileNames, 'VariableNames', {'ptCloudFilename'});
+for k = 1:numel(labelNames)
+    labelData.(labelNames{k}) = labelColumns{k};
+end
+
+test = lidarObjectDetectorTrainingData(gTruth)
 %% Transfer learning
 %Le --anchor boxes-- non indicano dove si trovano gli oggetti nel point cloud,
 % ma rappresentano le dimensioni tipiche (forma e scala) degli oggetti che 
@@ -40,17 +85,9 @@ classNames = {'Cyclist'};
 
 cyclistDetector = pointPillarsObjectDetector(detector.Network,pointCloudRange,classNames,anchorBoxes);
 
-%% set training data
-load("gTruth.mat")
-[pcds,bxds] = lidarObjectDetectorTrainingData(gTruth);
-trainingData = combine(pcds,bxds);
-
-pcdFolder = 'path_to_your_pcd_files'; % Specify the folder containing PCD files
-ds = datastore(fullfile(pcdFolder, '*.pcd'), 'Type', 'file');
-
 
 %% training
 
 options = trainingOptions("adam","ExecutionEnvironment","auto","ResetInputNormalization",false, ...
     "BatchNormalizationStatistics","moving","OutputNetwork","last-iteration");
-[newDetector,info] = trainPointPillarsObjectDetector(trainingData,cyclistDetector,options);
+[newDetector,info] = trainPointPillarsObjectDetector(labelData,cyclistDetector,options);
