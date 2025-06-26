@@ -6,6 +6,7 @@ cd('/Users/cristiansacco/workspaces/lidar')
 %% tools
 % lidarViewer
 % lidarLabeler("1_files_pcd/training_pcd/")
+% openExample('deeplearning_shared/Lidar3DObjectDetectionUsingPointPillarsExample')
 %% PointPillars model import
 pretrainedDetector = load("pretrainedPointPillarsDetector.mat","detector");
 detector = pretrainedDetector.detector;
@@ -80,12 +81,21 @@ xStep = 0.16;   % Resolution along X-axis.
 yStep = 0.16;   % Resolution along Y-axis.
 pointCloudRange = [xMin xMax yMin yMax zMin zMax];
 
-% anchorBoxes -> [l, w, h, c, a]
-anchorBoxes = estimateAnchorBoxes(labelData,2);
+% ANCHORBOXES -> [l, w, h, c, a]
+% opzione 1: a mano
 % anchorBoxes = {
 %     [1.8, 0.6, 1.7, 0.85, 0;   % frontale
 %     1.8, 0.6, 1.7, 0.85, pi/2];   % laterale
 % };
+% opzione 2: funzione estimate (non funzionante al momento, va configurato
+% il datastore)
+anchorBoxes = estimateAnchorBoxes(labelData,2);
+
+% opzione 3: 
+
+anchorBoxes = calculateAnchorsPointPillars()
+
+
 classNames = {'Cyclist'};
 
 cyclistDetector = pointPillarsObjectDetector(detector.Network,pointCloudRange,classNames,anchorBoxes);

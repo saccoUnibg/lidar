@@ -1,4 +1,5 @@
 function show_pcd(ptCloud,title_pcd)
+    close all
     figure(1)
     pcshow(ptCloud,"ColorSource","Intensity");
     title(title_pcd)

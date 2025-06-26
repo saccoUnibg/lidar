@@ -27,11 +27,13 @@ cd('/Users/cristiansacco/workspaces/lidar')
  ptCloudProcessed = functions.preprocess_pcd(ptCloud,25,0.75,0.75,0.1);
  angle = 220;
  ptCloudRotated = functions.rotate_pcd(ptCloudProcessed,angle);
+ ptCloudRestructured = functions.restructure_pcd(ptCloudRotated);
 %% 2. Show ptClouds
 
- functions.show(ptCloud,"ptCloud");
- functions.show(ptCloudProcessed,"ptCloudProcessed");
- functions.show(ptCloudRotated,"ptCloudRotated");
+ functions.show_pcd(ptCloud,"ptCloud");
+ functions.show_pcd(ptCloudProcessed,"ptCloudProcessed");
+ functions.show_pcd(ptCloudRotated,"ptCloudRotated");
+ functions.show_pcd(ptCloudRestructured,"ptCloudRestructured");
 %% 3. apply pointpillars pretrained model
 
 detectorObject = load("pretrainedPointPillarsDetector.mat","detector"); 
@@ -40,10 +42,10 @@ detector = detectorObject.detector;
 fprintf('Range coordinate del modello pretrained:\n')
 disp(detector.PointCloudRange)
 
-results = detect(detector,ptCloudRotated);
-[bboxes, scores, labels] = detect(detector, ptCloudRotated);
+results = detect(detector,ptCloudRestructured);
+[bboxes, scores, labels] = detect(detector, ptCloudRestructured);
 
-functions.show(ptCloudRotated,"Bboxes - Cars");% mostra la nuvola
+functions.show_pcd(ptCloudRestructured,"Bboxes - Cars");% mostra la nuvola
 
 hold on;
 showShape("cuboid", bboxes, ...
@@ -59,10 +61,10 @@ newDetector = newDetectorObject.newDetector;
 fprintf('Range coordinate del modello trainato:\n')
 disp(newDetector.PointCloudRange)
 
-newResults = detect(newDetector,ptCloudRotated);
-[bboxes1, scores1, labels1] = detect(newDetector, ptCloudRotated);
+newResults = detect(newDetector,ptCloudRestructured);
+[bboxes1, scores1, labels1] = detect(newDetector, ptCloudRestructured);
 
-functions.show_pcd(ptCloudRotated,"BBoxes - Cyclists")
+functions.show_pcd(ptCloudRestructured,"BBoxes - Cyclists")
 
 hold on;
 showShape("cuboid", bboxes1, ...
