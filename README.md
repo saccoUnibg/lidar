@@ -1,6 +1,8 @@
 # Tesi
 **Files**
 - main.m
+	- Object detection su point cloud passata in input
 - exportProcessedPcd.m
-	Crea files pcd elaborati presi da una cartella specifica
+	- Input: cartella di pcd grezzi
+	- Output: nuova cartella di pcd elaborati
 - trainingmodel.m

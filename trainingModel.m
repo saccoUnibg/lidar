@@ -3,7 +3,9 @@ clc
 clear
 close all
 cd('/Users/cristiansacco/workspaces/lidar')
-
+%% tools
+% lidarViewer
+% lidarLabeler("1_files_pcd/training_pcd/")
 %% PointPillars model import
 pretrainedDetector = load("pretrainedPointPillarsDetector.mat","detector");
 detector = pretrainedDetector.detector;
@@ -11,7 +13,7 @@ fprintf('Range coordinate del modello:\n')
 disp(detector.PointCloudRange)
 
 %% trainingData
-load('gTruth.mat');
+load("gTruth/gTruth_trainingPcd.mat");
 
 % 1. Trova tutti i file .pcd
 folderPCD = gTruth.DataSource.SourceName;
@@ -58,7 +60,10 @@ for k = 1:numel(labelNames)
     labelData.(labelNames{k}) = labelColumns{k};
 end
 
-test = lidarObjectDetectorTrainingData(gTruth)
+%% refactor table size
+tableSize = 20;
+labelData = labelData(1:tableSize, :);
+
 %% Transfer learning
 %Le --anchor boxes-- non indicano dove si trovano gli oggetti nel point cloud,
 % ma rappresentano le dimensioni tipiche (forma e scala) degli oggetti che 
@@ -76,18 +81,17 @@ yStep = 0.16;   % Resolution along Y-axis.
 pointCloudRange = [xMin xMax yMin yMax zMin zMax];
 
 % anchorBoxes -> [l, w, h, c, a]
-
-anchorBoxes = {
-    [1.8, 0.6, 1.7, 0.85, 0;   % frontale
-    1.8, 0.6, 1.7, 0.85, pi/2];   % laterale
-};
+anchorBoxes = estimateAnchorBoxes(labelData,2);
+% anchorBoxes = {
+%     [1.8, 0.6, 1.7, 0.85, 0;   % frontale
+%     1.8, 0.6, 1.7, 0.85, pi/2];   % laterale
+% };
 classNames = {'Cyclist'};
 
 cyclistDetector = pointPillarsObjectDetector(detector.Network,pointCloudRange,classNames,anchorBoxes);
-
 
 %% training
 
 options = trainingOptions("adam","ExecutionEnvironment","auto","ResetInputNormalization",false, ...
     "BatchNormalizationStatistics","moving","OutputNetwork","last-iteration");
-[newDetector,info] = trainPointPillarsObjectDetector(labelData,cyclistDetector,options);
+[newDetector,info] = trainPointPillarsObjectDetector(labelData,cyclistDetector,options)

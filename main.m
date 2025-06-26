@@ -1,69 +1,71 @@
-%% 0. Setup iniziale
-clc
-clear
-close all
-cd('/Users/cristiansacco/workspaces/lidar')
-%% Tools, examples and functions
+%% 000. Tools, examples and functions
 % -- TOOLS --
 % lidarViewer
 % lidarLabeler
 % deepNetworkDesigner
 % lidarLabeler('gTruth.mat')
-% ------------
+% -------------------------------------------------------------------------
 % -- EXAMPLES --
 % openExample('deeplearning_shared/Lidar3DObjectDetectionUsingPointPillarsExample')
-% ------------
+% -------------------------------------------------------------------------
 % -- FUNCTIONS --
 % functions.show        -> mostra la nuvola di punti
 % function.showVisible ->  mostra nuvola di punti che il modello è in grado di analizzare
-%% 1. ptCloud: Import data or load workspace (same .pcd)
-%  2. ptCloudProcessed: import and Preprocessing
+% -------------------------------------------------------------------------
+% PointCloud Range pointpillars model
+%   xmin    xmax    || ymin    ymax   || zmin   zmax     
+%   0       69.12   || -39.68  39.68  || -5	    5
+%% 0. Setup iniziale
 
-% - rimozione righe nulle
-% - rimozione punti oltre "max_distance"
-% - denoise
-% - downsample
-% - ground segmentation
- ptCloud = functions.importPointCloud('/Users/cristiansacco/Tesi/1_files_pcd/test07cropped',085);
- ptCloudProcessed = functions.preprocessingFunction(ptCloud,25,0.75,0.75,0.1);
+clc
+clear
+close all
+cd('/Users/cristiansacco/workspaces/lidar')
+%% 1. ptCLoud: import, preprocess, rotate
 
-%% 3. ptCloudRotated: Rotazione PointCloud per PointPillars Model
-%   xmin    xmax    ||ymin    ymax   ||zmin   zmax     
-%   0       69.12   ||-39.68  39.68  ||-5	    5
-
-theta = deg2rad(180);  % ad esempio ruota di 90° in senso antiorario
-R = [cos(theta) -sin(theta) 0;
-     sin(theta)  cos(theta) 0;
-     0           0          1];
-
-rotatedXYZ = (R * ptCloudProcessed.Location')';
-ptCloudRotated = pointCloud(rotatedXYZ, 'Intensity', ptCloudProcessed.Intensity);
-%% Show ptClouds
+ ptCloud = functions.import_pcd('/Users/cristiansacco/workspaces/lidar/1_files_pcd/test01cropped',20);
+ ptCloudProcessed = functions.preprocess_pcd(ptCloud,25,0.75,0.75,0.1);
+ angle = 220;
+ ptCloudRotated = functions.rotate_pcd(ptCloudProcessed,angle);
+%% 2. Show ptClouds
 
  functions.show(ptCloud,"ptCloud");
-
  functions.show(ptCloudProcessed,"ptCloudProcessed");
-
  functions.show(ptCloudRotated,"ptCloudRotated");
-%% import pointpillars model
-pretrainedDetector = load("pretrainedPointPillarsDetector.mat","detector");
-detector = pretrainedDetector.detector;
-fprintf('Range coordinate del modello:\n')
+%% 3. apply pointpillars pretrained model
+
+detectorObject = load("pretrainedPointPillarsDetector.mat","detector"); 
+detector = detectorObject.detector;
+
+fprintf('Range coordinate del modello pretrained:\n')
 disp(detector.PointCloudRange)
 
-%% 6. result: apply model on Point Cloud
+results = detect(detector,ptCloudRotated);
+[bboxes, scores, labels] = detect(detector, ptCloudRotated);
 
-results = detect(detector,ptCloudProcessed);
-[bboxes, scores, labels] = detect(detector, ptCloudProcessed);
+functions.show(ptCloudRotated,"Bboxes - Cars");% mostra la nuvola
 
-functions.show(ptCloudProcessed,"bounding boxes - Cyclists");% mostra la nuvola
-axis on; grid on;
-xlabel('X'); ylabel('Y'); zlabel('Z');
-view(3);    % vista 3D
-
-% Sovrapponi le bounding box
 hold on;
 showShape("cuboid", bboxes, ...
           "Label", labels, ...
           "Color", "g", ...
           "LineWidth", 1.5);
+
+%% apply newDetector trained with Cyclist label
+
+newDetectorObject = load("newDetector.mat");
+newDetector = newDetectorObject.newDetector;
+
+fprintf('Range coordinate del modello trainato:\n')
+disp(newDetector.PointCloudRange)
+
+newResults = detect(newDetector,ptCloudRotated);
+[bboxes1, scores1, labels1] = detect(newDetector, ptCloudRotated);
+
+functions.show_pcd(ptCloudRotated,"BBoxes - Cyclists")
+
+hold on;
+showShape("cuboid", bboxes1, ...
+          "Label", labels1, ...
+          "Color", "g", ...
+          "LineWidth", 1.5);    
