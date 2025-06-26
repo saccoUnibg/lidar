@@ -25,7 +25,7 @@ cd('/Users/cristiansacco/workspaces/lidar')
 
  ptCloud = functions.import_pcd('/Users/cristiansacco/workspaces/lidar/1_files_pcd/test01cropped',20);
  ptCloudProcessed = functions.preprocess_pcd(ptCloud,25,0.75,0.75,0.1);
- angle = 220;
+ angle = 160;
  ptCloudRotated = functions.rotate_pcd(ptCloudProcessed,angle);
  ptCloudRestructured = functions.restructure_pcd(ptCloudRotated);
 %% 2. Show ptClouds
@@ -34,6 +34,9 @@ cd('/Users/cristiansacco/workspaces/lidar')
  functions.show_pcd(ptCloudProcessed,"ptCloudProcessed");
  functions.show_pcd(ptCloudRotated,"ptCloudRotated");
  functions.show_pcd(ptCloudRestructured,"ptCloudRestructured");
+
+ %% 
+ functions.showVisible(ptCloudRotated);
 %% 3. apply pointpillars pretrained model
 
 detectorObject = load("pretrainedPointPillarsDetector.mat","detector"); 
