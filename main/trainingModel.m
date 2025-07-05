@@ -2,7 +2,7 @@
 clc
 clear
 close all
-cd('/Users/cristiansacco/workspaces/lidar')
+cd('/Users/cristiansacco/workspaces/lidar/main')
 %% tools
 % lidarViewer
 % lidarLabeler("1_files_pcd/training_pcd/")

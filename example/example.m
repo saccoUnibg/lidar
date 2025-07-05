@@ -2,7 +2,7 @@
 clc
 clear
 close all
-cd('/Users/cristiansacco/workspaces/lidar')
+cd('/Users/cristiansacco/workspaces/lidar/example')
 
 %% Download dataset from url and put in 'dataset' folder
 % https://ssd.mathworks.com/supportfiles/lidar/data/Pandaset_LidarData.tar.gz

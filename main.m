@@ -23,7 +23,7 @@ close all
 cd('/Users/cristiansacco/workspaces/lidar/main')
 %% 1. ptCLoud: import, preprocess, rotate
 
- ptCloud = functions.import_pcd('/Users/cristiansacco/workspaces/lidar/1_files_pcd/test01cropped',20);
+ ptCloud = functions.import_pcd('/Users/cristiansacco/workspaces/lidar/main/1_files_pcd/test01cropped',20);
  ptCloudProcessed = functions.preprocess_pcd(ptCloud,25,0.75,0.75,0.1);
  angle = 0;
  ptCloudRotated = functions.rotate_pcd(ptCloudProcessed,angle);

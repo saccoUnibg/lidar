@@ -10,7 +10,7 @@
 % -------------------------------------------------------------------------
 % -- FUNCTIONS --
 % functions.show        -> mostra la nuvola di punti
-% function.showVisible ->  mostra nuvola di punti che il modello è in grado di analizzare
+% function.showVisible  -> mostra nuvola di punti che il modello è in grado di analizzare
 % -------------------------------------------------------------------------
 % PointCloud Range pointpillars model
 %   xmin    xmax    || ymin    ymax   || zmin   zmax     
