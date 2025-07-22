@@ -66,6 +66,15 @@ ylabel('Y (m)');
 zlabel('Z (m)');
 
 reset(lidarData);
+%% CUSTOM: media punti tra i diversi point cloud
+% obtain length of croppedPointCloudObj
+pc = 0;
+for i= 1 : size(croppedPointCloudObj,1)
+
+    pc = pc + size(croppedPointCloudObj{i,1}.Location,1); % Accumulate point clouds
+end
+    pc = pc / (i + 1); % Average the accumulated point clouds
+
 
 %% Create Datastore Objects
 rng(1);
@@ -100,7 +109,7 @@ classNames = {'Car','Truck'};
 % Define colors for each class to plot bounding boxes.
 colors = {'green','magenta'};
 
-helperShowPointCloudWith3DBoxes(ptCld,bboxes,labels,classNames,colors)
+exampleFunctions.helperShowPointCloudWith3DBoxes(ptCld,bboxes,labels,classNames,colors)
 
 sampleLocation = fullfile(outputFolder,'GTsamples');
 [ldsSampled,bdsSampled] = sampleLidarData(cds,classNames,'MinPoints',20,...                  
@@ -161,7 +170,7 @@ ptCloud = testData{1,1};
 [bboxes,score,labels] = detect(detector,ptCloud);
 
 % Display the predictions on the point cloud.
-helperShowPointCloudWith3DBoxes(ptCloud,bboxes,labels,classNames,colors)
+exampleFunctions.helperShowPointCloudWith3DBoxes(ptCloud,bboxes,labels,classNames,colors)
 
 %% Evaluate Detector Using Test Set
 
