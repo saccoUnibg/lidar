@@ -8,6 +8,5 @@ function show_pcd(ptCloud,title_pcd)
     xlabel('X (m)');
     ylabel('Y (m)');
     zlabel('Z (m)');
-    hold on;
 end
 

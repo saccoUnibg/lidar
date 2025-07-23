@@ -5,6 +5,7 @@ close all
 cd('/Users/cristiansacco/workspaces/lidar/example')
 
 %% Download dataset from url and put in 'dataset' folder
+openExample('deeplearning_shared/Lidar3DObjectDetectionUsingPointPillarsExample')
 % https://ssd.mathworks.com/supportfiles/lidar/data/Pandaset_LidarData.tar.gz
 
 %% Load dataset
@@ -164,7 +165,15 @@ else
 end
 
 %% Generate Detections
-ptCloud = testData{1,1};
+ptCloud = testData{20,1};
+pcshow(ptCloud,"ColorSource","Intensity")
+
+axis on;
+
+grid on
+xlabel('X (m)');
+ylabel('Y (m)');
+zlabel('Z (m)');
 
 % Run the detector on the test point cloud.
 [bboxes,score,labels] = detect(detector,ptCloud);

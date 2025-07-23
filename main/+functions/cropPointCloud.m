@@ -13,26 +13,35 @@ function croppedPointCloudObj = cropPointCloud(lidarData,pcRange,invertiPointClo
     for i = 1:numFiles
         ptCloud = read(lidarData);
         if invertiPointCloud ==1
-            theta = pi;  % 180 gradi
-            Rz = [cos(theta), -sin(theta), 0;
-                  sin(theta),  cos(theta), 0;
-                  0,           0,          1];
-            xyz = ptCloud.Location;            % Nx3
-            intensity = ptCloud.Intensity;     % Nx1
-            xyz_rotated = (Rz * xyz')';
-            ptCloud = pointCloud(xyz_rotated, 'Intensity', intensity);
+            ptCloud = functions.rotate_pcd(ptCloud,pi);
         end
-        pos = find( ptCloud.Location(:,1) < xmax ...
-            & ptCloud.Location(:,1) > xmin ...
-            & ptCloud.Location(:,2) < ymax ...
-            & ptCloud.Location(:,2) > ymin ...
-            & ptCloud.Location(:,3) < zmax ...
-            & ptCloud.Location(:,3) > zmin);    
-        ptCloud = select(ptCloud, pos, 'OutputSize', 'full');
+
+        ptCloud = functions.organize_pcd(ptCloud);
+
+        if(numel(size(ptCloud.Location)) == 3)
+            % Organized point cloud
+            [x,y] = find( ptCloud.Location(:,:,1) < xmax ...
+                                & ptCloud.Location(:,:,1) > xmin ...
+                                & ptCloud.Location(:,:,2) < ymax ...
+                                & ptCloud.Location(:,:,2) > ymin ...
+                                & ptCloud.Location(:,:,3) < zmax ...
+                                & ptCloud.Location(:,:,3) > zmin);    
+            ptCloud = select(ptCloud, x, y, 'OutputSize', 'full'); 
+        else
+            % Unorganized point cloud
+            pos = find( ptCloud.Location(:,1) < xmax ...
+                & ptCloud.Location(:,1) > xmin ...
+                & ptCloud.Location(:,2) < ymax ...
+                & ptCloud.Location(:,2) > ymin ...
+                & ptCloud.Location(:,3) < zmax ...
+                & ptCloud.Location(:,3) > zmin);    
+            ptCloud = select(ptCloud, pos, 'OutputSize', 'full');
+        end
+        % ptCloud = functions.rotate_pcd(ptCloud,pi/2);
 
         processedData = removeInvalidPoints(ptCloud);
         croppedPointCloudObj{i,1} = processedData;
-
+        
     end
 end
 

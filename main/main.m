@@ -5,18 +5,18 @@ clear
 close all
 cd('/Users/cristiansacco/workspaces/lidar/main')
 % ptCloudProcessed = functions.preprocess_pcd(ptCloud,25,0.75,0.75,0.1);
+% lidarViewer
 %% 1. Load Dataset
  
 outputFolder = fullfile("1_files_pcd/");
-path = fullfile(outputFolder,'test00/');
+path = fullfile(outputFolder,'test11/');
 lidarData = fileDatastore(path,'ReadFcn',@(x) pcread(x));
-
 %% Show point cloud (to check rotation)
-ptCld = preview(lidarData);
-functions.show_pcd(ptCld,"Point Cloud - Input (Da ruotare?)");
+ptCloud = preview(lidarData);
+functions.show_pcd(ptCloud,"Point Cloud - Input (Da ruotare?)");
 
-%% 2. Preprocess data
-rotatePointCloud = 1;
+%% 2. Preprocess data - Point Cloud Front View
+rotatePointCloud = 0;
 
 xMin = 0.0;     % Minimum value along X-axis.
 xMax = 69.12;   % Maximum value along X-axis.
@@ -35,22 +35,24 @@ voxelSize = [xStep yStep];
 
 croppedPointCloudObj = functions.cropPointCloud(lidarData,pointCloudRange,rotatePointCloud);
 
-ptCloud = croppedPointCloudObj{20,1};
-functions.show_pcd(ptCloud,"Point Cloud - Front view");
-%% 3a. Downsample locale (maggiore sui punti vicini)
+ptCloudFrontView = croppedPointCloudObj{20,1};
+hold on;
+functions.show_pcd(ptCloudFrontView,"Point Cloud - Front view");
+
+%% 3a. Downsample locale (maggiore sui punti vicini) - Point Cloud Downsampled
 
 % scelgo distanza a cui fare downsample
-distanceDownsample = 20;
-idxNear = ptCloud.Location(:,1) < distanceDownsample;  % X = avanti
-ptNear = select(ptCloud, idxNear);
+distanceDownsample = 25;
+idxNear = ptCloudFrontView.Location(:,2) < distanceDownsample;  % Y = avanti
+ptNear = select(ptCloudFrontView, idxNear);
 
 % Downsample dei punti vicini considerando un solo punto per ogni cubo di
 % 0.15 di lato
-ptNearDS = pcdownsample(ptNear, 'gridAverage', 0.05);
+ptNearDS = pcdownsample(ptNear, 'gridAverage', 0.2);
 
 % Punti lontani li tengo così
-idxFar = ptCloud.Location(:,1) >= distanceDownsample;
-ptFar = select(ptCloud, idxFar);
+idxFar = ptCloudFrontView.Location(:,2) >= distanceDownsample;
+ptFar = select(ptCloudFrontView, idxFar);
 
 % Combino le due point cloud
 mergedLocs = [ptNearDS.Location; ptFar.Location];
@@ -72,7 +74,7 @@ functions.show_pcd(ptCloudDownsampled,"Point Cloud - Downsampled");
 % end
 % 
 % functions.show_pcd(ptCloudDownsampled,"Pt Cloud Downsampled");
-%% 4. Offset asse z
+%% 4. Offset asse z - Point Cloud Shifted
 % Applica un offset Z di -0.7 m per allineare al suolo KITTI
 locations = ptCloudDownsampled.Location;
 intensity = ptCloudDownsampled.Intensity;
@@ -82,21 +84,18 @@ locations(:,3) = locations(:,3) + offsetZ;
 ptCloudShifted = pointCloud(locations, 'Intensity', intensity);
 functions.show_pcd(ptCloudShifted,"Point Cloud - Z shifted");
 %% 5. Detection
-classNames = {'Car','Truck'};
-colors = {'green','magenta'};
+threshold = 0.5;
+%%
+functions.detect_pcd(ptCloudFrontView, threshold,"FrontView");
+%%
+functions.detect_pcd(ptCloudDownsampled,threshold,"Downsample");
+%%
+functions.detect_pcd(ptCloudShifted, threshold, "Z Shifted");
 
-pretrainedDetector = load('pretrainedPointPillarsDetector.mat','detector');
-detector = pretrainedDetector.detector;
-
-[bboxes,score,labels] = detect(detector,ptCloudShifted,"Threshold",0.5);
-
-if isempty(bboxes)
-    disp("Nessun oggetto rilevato.");
-else
-    disp("Oggetti rilevati: " + size(bboxes,1));
-end
-functions.helperShowPointCloudWith3DBoxes(ptCloudShifted,bboxes,labels,classNames,colors);
+%% functions.detect_pcd(ptCloudOrg, threshold, "Organized\n");
 %% 999. Misc
+
+
 zVals = ptCloudShifted.Location(:,3);
 
 figure;
