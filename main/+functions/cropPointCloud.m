@@ -1,4 +1,4 @@
-function croppedPointCloudObj = cropPointCloud(lidarData,pcRange,invertiPointCloud)
+function croppedPointCloudObj = cropPointCloud(lidarData,pcRange,ptCloudRotation)
     reset(lidarData)
     xmin = pcRange(1,1);
     xmax = pcRange(1,2);
@@ -11,12 +11,7 @@ function croppedPointCloudObj = cropPointCloud(lidarData,pcRange,invertiPointClo
     croppedPointCloudObj = cell(size(numFiles));
     
     for i = 1:numFiles
-        ptCloud = read(lidarData);
-        if invertiPointCloud ==1
-            ptCloud = functions.rotate_pcd(ptCloud,pi);
-        end
-
-        ptCloud = functions.organize_pcd(ptCloud);
+        % functions.show_pcd(ptCloud,"Point Cloud - Ruotata");
 
         if(numel(size(ptCloud.Location)) == 3)
             % Organized point cloud
@@ -37,7 +32,6 @@ function croppedPointCloudObj = cropPointCloud(lidarData,pcRange,invertiPointClo
                 & ptCloud.Location(:,3) > zmin);    
             ptCloud = select(ptCloud, pos, 'OutputSize', 'full');
         end
-        % ptCloud = functions.rotate_pcd(ptCloud,pi/2);
 
         processedData = removeInvalidPoints(ptCloud);
         croppedPointCloudObj{i,1} = processedData;

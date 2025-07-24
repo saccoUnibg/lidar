@@ -8,15 +8,16 @@ cd('/Users/cristiansacco/workspaces/lidar/main')
 % lidarViewer
 %% 1. Load Dataset
  
-outputFolder = fullfile("1_files_pcd/");
+outputFolder = fullfile("/Users/cristiansacco/workspaces/lidar/1_files_pcd/");
 path = fullfile(outputFolder,'test11/');
 lidarData = fileDatastore(path,'ReadFcn',@(x) pcread(x));
 %% Show point cloud (to check rotation)
 ptCloud = preview(lidarData);
 functions.show_pcd(ptCloud,"Point Cloud - Input (Da ruotare?)");
-
+reset(lidarData);
 %% 2. Preprocess data - Point Cloud Front View
-rotatePointCloud = 0;
+
+ptCloudRotation = 0; % fattore di rotazione
 
 xMin = 0.0;     % Minimum value along X-axis.
 xMax = 69.12;   % Maximum value along X-axis.
@@ -33,12 +34,13 @@ yStep = 0.16;   % Resolution along Y-axis.
 pointCloudRange = [xMin xMax yMin yMax zMin zMax];
 voxelSize = [xStep yStep];
 
-croppedPointCloudObj = functions.cropPointCloud(lidarData,pointCloudRange,rotatePointCloud);
+croppedPointCloudObj = functions.cropPointCloud(lidarData,pointCloudRange,ptCloudRotation);
 
 ptCloudFrontView = croppedPointCloudObj{20,1};
 hold on;
 functions.show_pcd(ptCloudFrontView,"Point Cloud - Front view");
 
+reset(lidarData);
 %% 3a. Downsample locale (maggiore sui punti vicini) - Point Cloud Downsampled
 
 % scelgo distanza a cui fare downsample
