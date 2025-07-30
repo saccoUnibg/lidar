@@ -18,6 +18,20 @@ function showPcdWith3dBoxes(ptCld,bboxes,labels,classNames,colors)
     ax = pcshow(ptCld,"ColorSource","Intensity"); 
     showShape('cuboid', bboxes, 'Parent', ax, 'Opacity', 0.1, ...
         'Color', labelColor, 'LineWidth', 0.5);
+
+    for i = 1:size(bboxes,1)
+        center = bboxes(i,1:3);           % centro del box
+        height = bboxes(i,6);             % altezza del box
+        labelStr = string(labels(i));     % etichetta
+    
+        % Sposta il testo sopra il box lungo Z
+        text(center(1)-2, center(2), center(3) + height/2 + 2, labelStr, ...
+             'Parent', ax, ...
+             'FontSize', 10, ...
+             'FontWeight', 'bold', ...
+             'Color', labelColor{i});
+    end
+
     zoom(ax,1.5);
     
     axis on
