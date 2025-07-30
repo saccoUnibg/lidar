@@ -1,10 +1,16 @@
 function ptCloudOrganized= organize_pcd(ptCloud)
 
-    % https://it.mathworks.com/help/lidar/ug/object-detection-using-pointpillars-network.html
-    % https://it.mathworks.com/help/lidar/ug/unorgaized-to-organized-pointcloud-conversion.html#UnorganizedToOrganizedConversionOfPointCloudsExample-6
+    % - https://it.mathworks.com/help/lidar/ug/object-detection-using-pointpillars-network.html
+    % Qua dice di fare pcorganize su parametri lidar 
+
+    % - https://it.mathworks.com/help/lidar/ug/unorgaized-to-organized-pointcloud-conversion.html#UnorganizedToOrganizedConversionOfPointCloudsExample-6
     % openExample('lidar/UnorganizedToOrganizedConversionOfPointCloudsExample')
-    % Il primo link dice che per il modello devo fare pcorganize, dal secondo
-    % link prendo i parametri del Pandar64
+    % Da qui prendo i parametri del Pandar64
+
+    % https://arxiv.org/pdf/2112.12610
+    % Qua dice che il pandaset usato per l'addestramento del modello è
+    % stato realizzato con un Pandar64 -> II.A "Data Collection", pg. 2,
+    % cerca "Pandar64"
 
     % vResolution = 64; parametro presente ma non utilizzato     
     hAngResolution = 0.2;

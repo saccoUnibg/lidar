@@ -128,7 +128,7 @@ helperShowPointCloudWith3DBoxes(ptCld,bboxes,labels,classNames,colors)
 
 %% Create PointPillars Object Detector
 
-anchorBoxes = calculateAnchorsPointPillars(trainLabels);
+anchorBoxes = exampleFunctions.calculateAnchorsPointPillars(trainLabels);
 detector = pointPillarsObjectDetector(pointCloudRange,classNames,anchorBoxes,...
     'VoxelSize',voxelSize); 
 
@@ -187,7 +187,7 @@ numInputs = 50;
 
 % Generate rotated rectangles from the cuboid labels.
 bds = boxLabelDatastore(testLabels(1:numInputs,:));
-groundTruthData = transform(bds,@(x)createRotRect(x));
+groundTruthData = transform(bds,@(x)exampleFunctions.createRotRect(x));
 
 detectionResults = detect(detector,testData(1:numInputs,:),...
                          'Threshold',0.25);

@@ -1,4 +1,4 @@
-function helperShowPointCloudWith3DBoxes(ptCld,bboxes,labels,classNames,colors)
+function showPcdWith3dBoxes(ptCld,bboxes,labels,classNames,colors)
     % Validate the length of classNames and colors are the same
     assert(numel(classNames) == numel(colors), 'ClassNames and Colors must have the same number of elements.');
     

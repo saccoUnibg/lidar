@@ -14,5 +14,5 @@ function detect_pcd(ptCloud,threshold,title)
         disp("Oggetti rilevati: " + size(bboxes,1));
         disp("Scores:" + score)
     end
-    functions.helperShowPointCloudWith3DBoxes(ptCloud,bboxes,labels,classNames,colors);
+    functions.showPcdWith3dBoxes(ptCloud,bboxes,labels,classNames,colors);
 end
