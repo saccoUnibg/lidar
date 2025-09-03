@@ -12,7 +12,9 @@ function detect_pcd(ptCloud,threshold,title)
         disp("Nessun oggetto rilevato.");
     else
         disp("Oggetti rilevati: " + size(bboxes,1));
-        disp("Scores:" + score)
+        for i = 1:numel(score)
+            disp("  Score: " + score(i) + " (" + string(labels(i))+")");
+        end
     end
     functions.showPcdWith3dBoxes(ptCloud,bboxes,labels,classNames,colors);
 end

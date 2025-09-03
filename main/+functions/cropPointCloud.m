@@ -20,7 +20,7 @@ function croppedPointCloudObj = cropPointCloud(lidarData)
     for i = 1:numFiles
         ptCloud = read(lidarData);
         
-        ptCloud = preprocessing(ptCloud);
+        ptCloud = functions.preprocess_pcd(ptCloud);
 
         % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         % Rototraslazione
@@ -61,12 +61,3 @@ end
 % -------------------------------------------------------------------------
 % -------------------------------------------------------------------------
 % -------------------------------------------------------------------------
-
-function [ptCloudProcessed] = preprocessing(ptCloud)
-    
-    elevation_threshold = 0.05;
-    ptCloud = removeInvalidPoints(ptCloud);
-    ptCloud = functions.organize_pcd(ptCloud);
-    [~,ptCloudProcessed,~] = segmentGroundSMRF(ptCloud,2,"ElevationThreshold",elevation_threshold);
-    
-end

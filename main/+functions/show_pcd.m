@@ -2,7 +2,7 @@ function show_pcd(ptCloud,title_pcd)
 
     figure()
     ax = pcshow(ptCloud,"ColorSource","Intensity");
-    set(ax,'XLim',[0 60],'YLim',[-40 40]);
+    set(ax,'XLim',[-40 40],'YLim',[-40 40]);
     title(title_pcd)
     axis on
     grid on

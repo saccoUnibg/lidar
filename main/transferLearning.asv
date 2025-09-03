@@ -38,40 +38,33 @@ trainingData = trainingData(1:tableSize, :);
 
 %% 3. Creazione detector object con classi, range e anchor boxes
 
-% 1. pointCloudRange -> import rete preaddestrata
+% 1. import rete preaddestrata -> pointCloudRange
 pretrainedDetector = load("pretrainedPointPillarsDetector.mat","detector");
 detector = pretrainedDetector.detector;
 fprintf('Range coordinate del modello preaddestrato:\n')
 disp(detector.PointCloudRange)
 
-% % POINT CLOUD RANGE
-% xMin = -34.56;
-% xMax = 34.56;
-% 
-% yMin = 0;
-% yMax = 34.56;
-% 
-% zMin = -5.0;
-% zMax = 5.0;
-% 
-% % Resolution along X-axis.
-% xStep = 0.16;
-% % Resolution along Y-axis.
-% yStep = 0.16;
-% pointCloudRange = [xMin xMax yMin yMax zMin zMax];
+% POINT CLOUD RANGE
+xMin = -34.56;
+xMax = 34.56;
 
-pointCloudRange = detector.PointCloudRange;
+yMin = 0;
+yMax = 34.56;
 
-% ---> SE NON METTO LO STESSO RANGE, IL TRAINING FALLISCE!
+zMin = -5.0;
+zMax = 5.0;
+
+% Resolution along X-axis.
+xStep = 0.16;
+% Resolution along Y-axis.
+yStep = 0.16;
+
+pointCloudRange = [xMin xMax yMin yMax zMin zMax];
 fprintf('Range coordinate del nuovo modello da addestrare:\n')
 disp(pointCloudRange);
 
-% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 % 2. ClassNames
 classNames = gTruth.LabelDefinitions.Name; % 'Cyclist', 'Car'
-
-% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 % 3. AnchorBoxes -> opzione 1: funzione presa da esempio in cima (da
 % mettere in functions nelle prossime iterazioni)
@@ -101,12 +94,12 @@ for ii = 1:numel(classNames)
     anchors = [anchors; {classAnchors}];
 end
 
-% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+pointCloudRange = detector.PointCloudRange;
 
 % 4. creazione detector
-cyclistDetector = pointPillarsObjectDetector(detector.Network,pointCloudRange,classNames,anchors);
+cyclistDetector = pointPillarsObjectDetector(detector.Network,detector,classNames,anchors);
 
-%% 4. training
+%% training
 
 options = trainingOptions("adam","ExecutionEnvironment","auto","ResetInputNormalization",false, ...
     "BatchNormalizationStatistics","moving","OutputNetwork","last-iteration");
