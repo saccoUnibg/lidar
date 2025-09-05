@@ -1,10 +1,11 @@
 %% --- 0. Setup iniziale
-clc; clear; close all;
-cd('/Users/cristiansacco/workspaces/lidar/main')
 % ptCloudProcessed = functions.preprocess_pcd(ptCloud,25,0.75,0.75,0.1);
 % lidarViewer
 % lidarLabeler
 % openExample('deeplearning_shared/Lidar3DObjectDetectionUsingPointPillarsExample')
+
+clc; clear; close all;
+cd('/Users/cristiansacco/workspaces/lidar/main')
 %% --- 1. Load Dataset
 outputFolder = fullfile("/Users/cristiansacco/workspaces/lidar/1_files_pcd/");
 path = fullfile(outputFolder,'test11/cropped');
@@ -15,7 +16,9 @@ functions.show_pcd(ptCloud,"Point Cloud - Input (Da ruotare?)");
 reset(lidarData);
 %% --- 3. Preprocess data - Point Cloud Front View
 
-croppedPointCloudObj = functions.cropPointCloud(lidarData);
+yaw = 0; % 0 / 90
+translation = 0; % 0: nessuna traslazione / 1: traslazione lungo l'asse
+croppedPointCloudObj = functions.cropPointCloud(lidarData,yaw,translation);
 
 ptCloudFrontView = croppedPointCloudObj{20,1};
 hold on;

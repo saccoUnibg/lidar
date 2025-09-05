@@ -63,13 +63,14 @@ disp(detector.PointCloudRange)
 pointCloudRange = detector.PointCloudRange;
 
 % ---> SE NON METTO LO STESSO RANGE, IL TRAINING FALLISCE!
+
 fprintf('Range coordinate del nuovo modello da addestrare:\n')
 disp(pointCloudRange);
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 % 2. ClassNames
-classNames = gTruth.LabelDefinitions.Name; % 'Cyclist', 'Car'
+classNames = gTruth.LabelDefinitions.Name; % {'Cyclist', 'Car'}
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

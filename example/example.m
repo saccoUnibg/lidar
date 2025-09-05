@@ -1,15 +1,10 @@
 %% Example Pointpillars
-clc
-clear
-close all
+clc; clear; close all;
 cd('/Users/cristiansacco/workspaces/lidar/example')
-
 %% Download dataset from url and put in 'dataset' folder
-openExample('deeplearning_shared/Lidar3DObjectDetectionUsingPointPillarsExample')
+% openExample('deeplearning_shared/Lidar3DObjectDetectionUsingPointPillarsExample')
 % https://ssd.mathworks.com/supportfiles/lidar/data/Pandaset_LidarData.tar.gz
-
 %% Load dataset
-
 outputFolder = fullfile("dataset/","Pandaset_LidarData/");
 path = fullfile(outputFolder,'Lidar/');
 lidarData = fileDatastore(path,'ReadFcn',@(x) pcread(x));
@@ -28,10 +23,7 @@ zoom(ax,2.5);
 axis on;
 
 grid on
-xlabel('X (m)');
-ylabel('Y (m)');
-zlabel('Z (m)');
-
+xlabel('X (m)'); ylabel('Y (m)'); zlabel('Z (m)');
 %% Preprocess data
 % crop pcd 
 xMin = 0.0;     % Minimum value along X-axis.
@@ -48,7 +40,6 @@ voxelSize = [xStep yStep];
 
 % function: crop front view + select boxLabels inside ROI (ROI dimensions
 % set by params over there)
-
 [croppedPointCloudObj,processedLabels] = exampleFunctions.cropFrontViewFromLidarData(...
     lidarData,boxLabels,pointCloudRange);
 
@@ -58,13 +49,9 @@ bboxes = [processedLabels.Car{1};processedLabels.Truck{1}];
 ax = pcshow(pc);
 showShape('cuboid',bboxes,'Parent',ax,'Opacity',0.1,...
         'Color','green','LineWidth',0.5);
-
 axis on;
-
 grid on
-xlabel('X (m)');
-ylabel('Y (m)');
-zlabel('Z (m)');
+xlabel('X (m)'); ylabel('Y (m)'); zlabel('Z (m)');
 
 reset(lidarData);
 %% CUSTOM: media punti tra i diversi point cloud
@@ -75,8 +62,6 @@ for i= 1 : size(croppedPointCloudObj,1)
     pc = pc + size(croppedPointCloudObj{i,1}.Location,1); % Accumulate point clouds
 end
     pc = pc / (i + 1); % Average the accumulated point clouds
-
-
 %% Create Datastore Objects
 rng(1);
 shuffledIndices = randperm(size(processedLabels,1));
@@ -98,7 +83,6 @@ lds = fileDatastore(dataLocation,'ReadFcn',@(x) pcread(x));
 bds = boxLabelDatastore(trainLabels);
 
 cds = combine(lds,bds);
-
 %% Perform Data Augmentation
 
 augData = preview(cds);
@@ -120,18 +104,16 @@ cdsSampled = combine(ldsSampled,bdsSampled);
 numObjects = [10 10];
 cdsAugmented = transform(cds,@(x)pcBboxOversample(x,cdsSampled,classNames,numObjects));
 
-cdsAugmented = transform(cdsAugmented,@(x)helperAugmentData(x));
+cdsAugmented = transform(cdsAugmented,@(x)exampleFunctions.helperAugmentData(x));
 
 augData = preview(cdsAugmented);
 [ptCld,bboxes,labels] = deal(augData{1},augData{2},augData{3});
-helperShowPointCloudWith3DBoxes(ptCld,bboxes,labels,classNames,colors)
+exampleFunctions.helperShowPointCloudWith3DBoxes(ptCld,bboxes,labels,classNames,colors)
 
 %% Create PointPillars Object Detector
 
 anchorBoxes = exampleFunctions.calculateAnchorsPointPillars(trainLabels);
-detector = pointPillarsObjectDetector(pointCloudRange,classNames,anchorBoxes,...
-    'VoxelSize',voxelSize); 
-
+detector = pointPillarsObjectDetector(pointCloudRange,classNames,anchorBoxes,'VoxelSize',voxelSize); 
 %% Specify Training Options
 
 executionEnvironment = "auto";
@@ -153,7 +135,6 @@ options = trainingOptions('adam',...
     CheckpointFrequency = 10, ...
     CheckpointFrequencyUnit = 'epoch', ...
     CheckpointPath = userpath);
-
 %% Train PointPillars Object Detector
 
 doTraining = false;
@@ -163,24 +144,19 @@ else
     pretrainedDetector = load('pretrainedPointPillarsDetector.mat','detector');
     detector = pretrainedDetector.detector;
 end
-
 %% Generate Detections
 ptCloud = testData{20,1};
 pcshow(ptCloud,"ColorSource","Intensity")
 
 axis on;
-
 grid on
-xlabel('X (m)');
-ylabel('Y (m)');
-zlabel('Z (m)');
+xlabel('X (m)'); ylabel('Y (m)'); zlabel('Z (m)');
 
 % Run the detector on the test point cloud.
 [bboxes,score,labels] = detect(detector,ptCloud);
 
 % Display the predictions on the point cloud.
 exampleFunctions.helperShowPointCloudWith3DBoxes(ptCloud,bboxes,labels,classNames,colors)
-
 %% Evaluate Detector Using Test Set
 
 numInputs = 50;
@@ -189,8 +165,7 @@ numInputs = 50;
 bds = boxLabelDatastore(testLabels(1:numInputs,:));
 groundTruthData = transform(bds,@(x)exampleFunctions.createRotRect(x));
 
-detectionResults = detect(detector,testData(1:numInputs,:),...
-                         'Threshold',0.25);
+detectionResults = detect(detector,testData(1:numInputs,:),'Threshold',0.25);
 
 % Convert the bounding boxes to rotated rectangles format and calculate
 % the evaluation metrics.

@@ -1,4 +1,4 @@
-function croppedPointCloudObj = cropPointCloud(lidarData)
+function croppedPointCloudObj = cropPointCloud(lidarData,yaw,translation)
     reset(lidarData)
     xmin = 0.0;     % Minimum value along X-axis.
     xmax = 69.12;   % Maximum value along X-axis.
@@ -24,11 +24,20 @@ function croppedPointCloudObj = cropPointCloud(lidarData)
 
         % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         % Rototraslazione
+        
+        if translation ~= 0
+            value = xmax/2;
+        else
+            value = 0;
+        end
 
-        rotationAngles = [0 0 90];
-        translation = [xmax/2 0 0];
-        % translation = [0 0 0];
-        tform = rigidtform3d(rotationAngles,translation);
+        rotationAngles = [0 0 yaw];
+        if yaw ~=0
+            tform_translation = [value 0 0];
+        else
+            tform_translation = [0 value 0];
+        end
+        tform = rigidtform3d(rotationAngles,tform_translation);
         ptCloud = pctransform(ptCloud,tform);
         % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
