@@ -1,10 +1,7 @@
-function detect_pcd(ptCloud,threshold,title)
+function detect_pcd(ptCloud,detector, threshold,title)
     disp(title)
-    classNames = {'Car','Truck'};
+    classNames = detector.ClassNames;
     colors = {'green','magenta'};
-    
-    pretrainedDetector = load('pretrainedPointPillarsDetector.mat','detector');
-    detector = pretrainedDetector.detector;
     
     [bboxes,score,labels] = detect(detector,ptCloud,"Threshold",threshold);
     
@@ -13,8 +10,8 @@ function detect_pcd(ptCloud,threshold,title)
     else
         disp("Oggetti rilevati: " + size(bboxes,1));
         for i = 1:numel(score)
-            disp("  Score: " + score(i) + " (" + string(labels(i))+")");
+            disp("  ("+string(i)+") Score: " + score(i) + " (" + string(labels(i))+")");
         end
     end
-    functions.showPcdWith3dBoxes(ptCloud,bboxes,labels,classNames,colors);
+    functions.showPcdWith3dBoxes(ptCloud,bboxes,labels,classNames,colors,title);
 end

@@ -1,4 +1,4 @@
-function showPcdWith3dBoxes(ptCld,bboxes,labels,classNames,colors)
+function showPcdWith3dBoxes(ptCld,bboxes,labels,classNames,colors,title_pcd)
     % Validate the length of classNames and colors are the same
     assert(numel(classNames) == numel(colors), 'ClassNames and Colors must have the same number of elements.');
     
@@ -18,11 +18,11 @@ function showPcdWith3dBoxes(ptCld,bboxes,labels,classNames,colors)
     ax = pcshow(ptCld,"ColorSource","Intensity"); 
     showShape('cuboid', bboxes, 'Parent', ax, 'Opacity', 0.1, ...
         'Color', labelColor, 'LineWidth', 0.5);
-
+    
     for i = 1:size(bboxes,1)
         center = bboxes(i,1:3);           % centro del box
         height = bboxes(i,6);             % altezza del box
-        labelStr = string(labels(i));     % etichetta
+        labelStr = string(i) + "-" + string(labels(i));    % etichetta
     
         % Sposta il testo sopra il box lungo Z
         text(center(1)-2, center(2), center(3) + height/2 + 2, labelStr, ...
@@ -31,7 +31,7 @@ function showPcdWith3dBoxes(ptCld,bboxes,labels,classNames,colors)
              'FontWeight', 'bold', ...
              'Color', labelColor{i});
     end
-
+    title(title_pcd)
     zoom(ax,1.5);
     
     axis on

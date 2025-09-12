@@ -9,33 +9,13 @@ lidarData = fileDatastore(path,'ReadFcn',@(x) pcread(x));
 ptCloud = preview(lidarData);
 functions.show_pcd(ptCloud,"Point Cloud - Input (Da ruotare?)");
 
-%% rotazione 90 gradi
-% Rotazione 90 gradi -> y positivo frontale
-rotationAngles = [0 0 90];
-translation = [0 0 0];
-tform = rigidtform3d(rotationAngles,translation);
-ptCloudRot = pctransform(ptCloud,tform);
-
-figure()
-ax = pcshow(ptCloudRot,"ColorSource","Intensity");
-set(ax,'XLim',[-30 30],'YLim',[0 30]);
-title("Pcd Ruotata");
-axis on
-grid on
-xlabel('X (m)');
-ylabel('Y (m)');
-zlabel('Z (m)');
-
-%% ciclo su datastore: vuoto
+%% show pcd for tl
 newPath = "/Users/cristiansacco/workspaces/lidar/1_files_pcd/0_transfer_learning/";
-endpoint = "set_01";
+endpoint = "set_00/pcd_00";
 fullPath = newPath + endpoint;
-
-numFiles = size(lidarData.Files,1);
-for i = 1:numFiles
-    ptCloud = read(lidarData);
-    % lavorare su pcd del datastore qua
-end
+lidarData = fileDatastore(fullPath,'ReadFcn',@(x) pcread(x));
+ptCloudTL = preview(lidarData);
+functions.show_pcd(ptCloudTL,"tl");
 
 %% ciclo su datastore: ruota e salva
 newPath = "/Users/cristiansacco/workspaces/lidar/1_files_pcd/0_transfer_learning/";
@@ -73,7 +53,7 @@ end
 
 %% visualizzazione point cloud datastore
 newPath = "/Users/cristiansacco/workspaces/lidar/1_files_pcd/0_transfer_learning/";
-endpoint = "set_01";
+endpoint = "set_01/pcd_01";
 fullPath = newPath + endpoint;
 
 lidarData = fileDatastore(fullPath,'ReadFcn',@(x) pcread(x));
@@ -81,7 +61,24 @@ lidarData = fileDatastore(fullPath,'ReadFcn',@(x) pcread(x));
 ptCloud = read(lidarData);
 functions.show_pcd(ptCloud,"PtCloud");
 
-%% Funzioni utilizzate dagli script
+%% rotazione 90 gradi
+% Rotazione 90 gradi -> y positivo frontale
+rotationAngles = [0 0 0];
+translation = [0 0 0];
+tform = rigidtform3d(rotationAngles,translation);
+ptCloudRot = pctransform(ptCloud,tform);
+
+figure()
+ax = pcshow(ptCloudRot,"ColorSource","Intensity");
+set(ax,'XLim',[-30 30],'YLim',[0 30]);
+title("Pcd Ruotata");
+axis on
+grid on
+xlabel('X (m)');
+ylabel('Y (m)');
+zlabel('Z (m)');
+
+%% Lista funzioni utilizzate dagli script
 cd('/Users/cristiansacco/workspaces/lidar/main')
 matlab.codetools.requiredFilesAndProducts('main.m')'
 matlab.codetools.requiredFilesAndProducts('transferLearning.m')'
@@ -98,19 +95,36 @@ grid on;
 
 %% test new detector trained
 
+newPath = "/Users/cristiansacco/workspaces/lidar/1_files_pcd/0_transfer_learning/";
+endpoint = "set_01/pcd_01";
+fullPath = newPath + endpoint;
+
+lidarData = fileDatastore(fullPath,'ReadFcn',@(x) pcread(x));
+
+ptCloud = read(lidarData);
+functions.show_pcd(ptCloud,"PtCloud");
+
 disp("Nuovo detector")
 classNames = {'Cyclist','Car'};
 colors = {'green','magenta'};
 threshold = 0.4;
+newDetectorObject = load("newDetector_13righe.mat");
 
-[bboxes,score,labels] = detect(newDetector,ptCloudShiftedDownsampled);
+newDetector = newDetectorObject.newDetector;
+[bboxes,score,labels] = detect(newDetector,ptCloud,"Threshold",threshold);
 
-if isempty(bboxes)
-    disp("Nessun oggetto rilevato.");
-else
-    disp("Oggetti rilevati: " + size(bboxes,1));
-    for i = 1:numel(score)
-        disp("  Score: " + score(i) + " (" + string(labels(i))+")");
-    end
+functions.detect_pcd(ptCloud,newDetector,threshold,"Inferenza New Detector");
+
+%% convertire .pcd in .ply
+outputFolder = fullfile("/Users/cristiansacco/workspaces/lidar/1_files_pcd/test11/cropped");
+lidarData = fileDatastore(outputFolder,'ReadFcn',@(x) pcread(x));
+% ptCloud = preview(lidarData);
+% functions.show_pcd(ptCloud,"Point Cloud - Input (Da ruotare?)");
+reset(lidarData);
+numFiles = size(lidarData.Files,1);
+for i= 1 : numFiles
+    ptCloud = read(lidarData);
+    ply_path = fullfile("/Users/cristiansacco/workspaces/lidar/1_files_pcd/test11/ply");
+    plyFileName = fullfile(ply_path, sprintf('ply_test11_%03d.ply', i));
+    pcwrite(ptCloud,plyFileName,"Encoding","binary");
 end
-functions.showPcdWith3dBoxes(ptCloud,bboxes,labels,classNames,colors);

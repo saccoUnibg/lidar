@@ -16,11 +16,11 @@ functions.show_pcd(ptCloud,"Point Cloud - Input (Da ruotare?)");
 reset(lidarData);
 %% --- 3. Preprocess data - Point Cloud Front View
 
-yaw = 0; % 0 / 90
-translation = 0; % 0: nessuna traslazione / 1: traslazione lungo l'asse
+yaw = 90; % 0 / 90
+translation = 1; % 0: nessuna traslazione / 1: traslazione lungo l'asse
 croppedPointCloudObj = functions.cropPointCloud(lidarData,yaw,translation);
 
-ptCloudFrontView = croppedPointCloudObj{20,1};
+ptCloudFrontView = croppedPointCloudObj{22,1};
 hold on;
 functions.show_pcd(ptCloudFrontView,"Point Cloud - Front view");
 reset(lidarData);
@@ -78,14 +78,30 @@ offsetZ = -0.7;
 locations(:,3) = locations(:,3) + offsetZ;
 ptCloudShiftedDownsampled = pointCloud(locations, 'Intensity', intensity);
 functions.show_pcd(ptCloudShiftedDownsampled,"Point Cloud - Z shifted downsampled");
-%% --- Detection
+%% --- Detection modello preaddestrato
+% threshold = 0.30;
+threshold = 0.4;
+pretrainedDetector = load('pretrainedPointPillarsDetector.mat','detector');
+detector = pretrainedDetector.detector;
+%%
+functions.detect_pcd(ptCloudFrontView, detector, threshold,"FrontView");
+%%
+functions.detect_pcd(ptCloudDownsampled, detector, threshold,"Downsample");
+%%
+functions.detect_pcd(ptCloudShifted, detector, threshold, "Z Shifted");
+%%
+functions.detect_pcd(ptCloudShiftedDownsampled, detector, threshold, "Z Shifted downsampled");
+
+%% Detection su nuovo modello
 % threshold = 0.30; 
 threshold = 0.4;
-%%
-functions.detect_pcd(ptCloudFrontView, threshold,"FrontView");
-%%
-functions.detect_pcd(ptCloudDownsampled,threshold,"Downsample");
-%%
-functions.detect_pcd(ptCloudShifted, threshold, "Z Shifted");
-%%
-functions.detect_pcd(ptCloudShiftedDownsampled, threshold, "Z Shifted downsampled");
+newDetectorObject = load('newDetector_01_22righe.mat');
+newDetector = newDetectorObject.newDetector;
+
+functions.detect_pcd(ptCloudFrontView, newDetector, threshold,"FrontView");
+
+functions.detect_pcd(ptCloudDownsampled, newDetector, threshold,"Downsample");
+
+functions.detect_pcd(ptCloudShifted, newDetector, threshold, "Z Shifted");
+
+functions.detect_pcd(ptCloudShiftedDownsampled, newDetector, threshold, "Z Shifted downsampled");
