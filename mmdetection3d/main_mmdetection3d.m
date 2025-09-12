@@ -1,0 +1,34 @@
+%% 
+clc;clear; close all;
+cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
+%% Struttura folder
+
+%   /test00
+%      |
+%       /bin
+%       /json
+%       /pcd
+%   /test01
+%      |
+%       /bin
+%       /json
+%       /pcd
+%   ...
+
+%% Scelta cartella di test da convertire 
+path = "/Users/cristiansacco/test01";
+
+%% 1. Export cartella di files .bin da path contenente .pcd
+functions.export_bin_files(path);
+
+%% 2. import json e proiezione bounding box
+binFolderPath = functions.process_json_folder(path);
+
+%% Extra: Visualizzazione bb su pcd
+
+pcd = functions.bin_to_pcd(binFile);
+functions.show_pcd(pcd,"Originale");
+figure()
+pcshow(pcd,"ColorSource","Intensity");
+threshold = 0.5;
+functions.show_bb_over_pcd(jsonFile,pcd,threshold);

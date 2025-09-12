@@ -115,16 +115,4 @@ newDetector = newDetectorObject.newDetector;
 
 functions.detect_pcd(ptCloud,newDetector,threshold,"Inferenza New Detector");
 
-%% convertire .pcd in .ply
-outputFolder = fullfile("/Users/cristiansacco/workspaces/lidar/1_files_pcd/test11/cropped");
-lidarData = fileDatastore(outputFolder,'ReadFcn',@(x) pcread(x));
-% ptCloud = preview(lidarData);
-% functions.show_pcd(ptCloud,"Point Cloud - Input (Da ruotare?)");
-reset(lidarData);
-numFiles = size(lidarData.Files,1);
-for i= 1 : numFiles
-    ptCloud = read(lidarData);
-    ply_path = fullfile("/Users/cristiansacco/workspaces/lidar/1_files_pcd/test11/ply");
-    plyFileName = fullfile(ply_path, sprintf('ply_test11_%03d.ply', i));
-    pcwrite(ptCloud,plyFileName,"Encoding","binary");
-end
+
