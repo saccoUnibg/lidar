@@ -2,7 +2,6 @@
 clc;clear; close all;
 cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 %% Struttura folder
-
 %   /test00
 %      |
 %       /bin
@@ -17,7 +16,6 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 
 %% Scelta cartella di test da convertire 
 path = "/Users/cristiansacco/test01";
-
 %% 1. Export cartella di files .bin da path contenente .pcd
 functions.export_bin_files(path);
 
