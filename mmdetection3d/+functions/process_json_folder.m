@@ -1,13 +1,13 @@
 function results = process_json_folder(path)
-    jsonPath = path + "/json";
+    jsonPath = path + "/3_json";
     if ~isfolder(jsonPath)
-        error('La cartella non esiste: %s', path);
+        error('La cartella non esiste: %s', jsonPath);
     end
 
-    jsonFiles = dir(fullfile(path, '*.json'));
+    jsonFiles = dir(fullfile(jsonPath, '*.json'));
 
     if isempty(jsonFiles)
-        warning('Nessun file JSON trovato in %s', path);
+        warning('Nessun file JSON trovato in %s', jsonPath);
         results = [];
         return;
     end
@@ -20,10 +20,10 @@ function results = process_json_folder(path)
         'scores',   []);
 
     for k = 1:numel(jsonFiles)
-        jsonPath = fullfile(path, jsonFiles(k).name);
+        jsonFile = fullfile(jsonPath, jsonFiles(k).name);
 
         % Estrazione info da singolo json
-        [boxes, labels, scores] = functions.get_bb(jsonPath);
+        [boxes, labels, scores] = functions.get_results(jsonFile);
 
         % Inserisci nei campi della struct
         results(k).fileName = jsonFiles(k).name;

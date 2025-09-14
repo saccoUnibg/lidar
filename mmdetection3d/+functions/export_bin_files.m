@@ -1,7 +1,8 @@
 function export_bin_files(path)
     
-    binPath = path + "/bin";
-    pcdPath = path + "/pcd";
+    pcdPath = path + "/1_pcd";  
+    binPath = path + "/2_bin";
+
     lidarData = fileDatastore(pcdPath,'ReadFcn',@(x) pcread(x));
     
     if ~exist(binPath, 'dir')
@@ -11,7 +12,8 @@ function export_bin_files(path)
             numFiles = size(lidarData.Files,1);
             for i = 1:numFiles
                 ptCloud = read(lidarData);
-                functions.show_pcd(ptCloud,"pcd");
+                % functions.show_pcd(ptCloud,"pcd");
+
                 % operazione da controllare: posso fornirli raw?
                 % ptCloud = functions.preprocess_pcd(ptCloud);
     

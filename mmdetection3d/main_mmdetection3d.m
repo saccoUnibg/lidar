@@ -5,18 +5,19 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 %% Struttura folder
 %   /test00
 %      |
-%       /bin
-%       /json
-%       /pcd
+%       /1_pcd
+%       /2_bin
+%       /3_json
+
 %   /test01
 %      |
-%       /bin
-%       /json
-%       /pcd
+%       /1_pcd
+%       /2_bin
+%       /3_json
 %   ...
 
 %% Scelta cartella di test da convertire 
-path = "/Users/cristiansacco/test02";
+path = "/Users/cristiansacco/workspaces/lidar/tests/test01";
 %% 1. Export .pcd -> .bin da path
 functions.export_bin_files(path);
 
@@ -26,7 +27,7 @@ disp(out)
 
 % guarda ----> pyrunfile
 %% 2. import json e proiezione bounding box
-binFolderPath = functions.process_json_folder(path);
+results = functions.process_json_folder(path);
 
 %% Extra: Visualizzazione bb su pcd
 binFile = "/Users/cristiansacco/workspaces/lidar/mmdetection3d/bin/test.bin";
