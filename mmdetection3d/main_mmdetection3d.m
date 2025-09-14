@@ -1,5 +1,6 @@
 %% 
 clc;clear; close all;
+importlib = py.importlib.import_module('importlib');
 cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 %% Struttura folder
 %   /test00
@@ -16,9 +17,14 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 
 %% Scelta cartella di test da convertire 
 path = "/Users/cristiansacco/test02";
-%% 1. Export cartella di files .bin da path contenente .pcd
+%% 1. Export .pcd -> .bin da path
 functions.export_bin_files(path);
 
+%% 2. Inferenza tramite script .py
+[status, out] = system('python3 script_inference.py');
+disp(out)
+
+% guarda ----> pyrunfile
 %% 2. import json e proiezione bounding box
 binFolderPath = functions.process_json_folder(path);
 

@@ -1,5 +1,7 @@
 %% 
 clc;clear; close all;
+
+terminate(pyenv)
 cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 %% Struttura folder
 %   /test00
@@ -16,9 +18,11 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 
 %% Scelta cartella di test da convertire 
 path = "/Users/cristiansacco/test02";
-%% 1. Export cartella di files .bin da path contenente .pcd
+%% 1. Export .pcd -> .bin da path
 functions.export_bin_files(path);
 
+%% 2. Inferenza tramite script .py
+py.script_inference.f1();
 %% 2. import json e proiezione bounding box
 binFolderPath = functions.process_json_folder(path);
 
