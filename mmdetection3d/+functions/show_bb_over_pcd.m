@@ -24,7 +24,7 @@ C = lines(max(3, numel(classNames))); % tavolozza base
 % --- 4) Disegna ogni box con colore per classe e etichetta/score ---
 n = size(boxes,1);
 for i = 1:n
-    if scores(i) < threshold || scores(i)<0.73 || scores(i)>0.75
+    if scores(i) < threshold
         continue;
     end
     clsId = labels(i) + 1; % JSON usa 0-based; MATLAB è 1-based

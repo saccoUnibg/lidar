@@ -1,5 +1,5 @@
 function results = process_json_folder(path)
-    jsonPath = path + "/3_json";
+    jsonPath = path + "/3_json/preds";
     if ~isfolder(jsonPath)
         error('La cartella non esiste: %s', jsonPath);
     end
