@@ -5,7 +5,7 @@ clc;clear; close all;
 cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 
 % Ubuntu
-cd('home/cal/Documents/Crstian_S/mmdetection3d')
+% cd('home/cal/Documents/Cristian_S/mmdetection3d')
 
 % importlib = py.importlib.import_module('importlib');
 % lidarViewer
@@ -30,9 +30,9 @@ cd('home/cal/Documents/Crstian_S/mmdetection3d')
 
 %% Scelta cartella di test da convertire
 % Per Mac:
-% path = "/Users/cristiansacco/workspaces/lidar/tests/test25";
+path = "/Users/cristiansacco/workspaces/lidar/tests/test99";
 % Per Ubuntu:
-path = "pcd_tests/test99";
+% path = "pcd_tests/test99";
 
 %% 0. crop pcd
 functions.crop_pcd_folder(path);
@@ -50,13 +50,16 @@ cmd = " python3 run_batch.py --input " + input_path + " --output " + output_path
 disp("--- Comando python eseguito: " + cmd);
 [status, out] = system(cmd);
 disp(out)
+
 %% 3. import json e proiezione bounding box
 results = functions.process_json_folder(path);
 
-%% 4: Visualizzazione bb su pcd (da ottimizzare)
-threshold = 0.5;
+%% 3b. import workspace (per lavorare su Mac)
+% ricordati di salvare anche cartella di test
+load("/Users/cristiansacco/workspaces/lidar/mmdetection3d/workspace.mat")
+
+%% 4a. Visualizzazione bb su pcd (da ottimizzare)
+threshold = 0.25;
 functions.show_results(path,results,threshold);
-% jsonFile = "/Users/cristiansacco/workspaces/lidar/tests/test01/3_json/preds/bin_001.json";
-% pointCloudFile = "/Users/cristiansacco/workspaces/lidar/tests/test01/1_pcd/test01 (Frame 0040).pcd";
-% threshold = 0.5;
-% functions.show_bb_over_pcd(jsonFile,pointCloudFile,threshold);
+
+%% 4b. Estrazione punti interni a una bb

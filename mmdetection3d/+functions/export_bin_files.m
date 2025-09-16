@@ -27,6 +27,11 @@ function export_bin_files(path)
                 % ptCloudRotated = pctransform(ptCloud, tform);
                 
                 % salvataggio pcd in fullPath
+                
+                distance = 25;
+                value = 0.2;
+                ptCloud = downsample_pcd(ptCloud,distance,value);
+
                 bin_FileName = fullfile(binPath, sprintf('bin_%03d.bin', i));
                 pcd_to_bin(ptCloud,bin_FileName)
             end
@@ -63,4 +68,25 @@ function pcd_to_bin(pcdFile,binFileName)
     fid = fopen(binFileName,'wb','ieee-le');
     fwrite(fid, data', 'single');   % trasposto per scrittura corretta
     fclose(fid);
+end
+
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+function pcd_downsampled = downsample_pcd(pcd,distance,value)
+
+    idxNear = pcd.Location(:,2) < distance;  % Y = avanti
+    ptNear = select(pcd, idxNear);
+    
+    % Downsample dei punti vicini considerando un solo punto per ogni cubo di
+    % 0.2 di lato
+    ptNearDS = pcdownsample(ptNear, 'gridAverage', value);
+    
+    % Punti lontani li tengo così
+    idxFar = pcd.Location(:,2) >= distance;
+    ptFar = select(pcd, idxFar);
+    
+    % Combino le due point cloud
+    mergedLocs = [ptNearDS.Location; ptFar.Location];
+    mergedInt = [ptNearDS.Intensity; ptFar.Intensity];
+    pcd_downsampled = pointCloud(mergedLocs, 'Intensity', mergedInt);
 end
