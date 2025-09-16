@@ -1,8 +1,8 @@
 %% 
 clc;clear; close all;
+importlib = py.importlib.import_module('importlib');
 cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 
-% importlib = py.importlib.import_module('importlib');
 % lidarViewer
 % lidarLabeler
 % matlab.codetools.requiredFilesAndProducts('main_mmdetection3d.m')'
@@ -25,7 +25,7 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 
 %% Scelta cartella di test da convertire
 % Per Mac:
-path = "/Users/cristiansacco/workspaces/lidar/tests/test25";
+path = "/Users/cristiansacco/workspaces/lidar/tests/test07";
 % Per Ubuntu:
 % path = "tests/test07";
 
@@ -45,6 +45,7 @@ cmd = " python run_batch.py --input " + input_path + " --output " + output_path;
 disp("Comando python eseguito: " + cmd);
 [status, out] = system(cmd);
 disp(out)
+
 %% 3. import json e proiezione bounding box
 results = functions.process_json_folder(path);
 

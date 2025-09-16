@@ -23,7 +23,7 @@ function results = process_json_folder(path)
         jsonFile = fullfile(jsonPath, jsonFiles(k).name);
 
         % Estrazione info da singolo json
-        [boxes, labels, scores] = functions.get_results(jsonFile);
+        [boxes, labels, scores] = get_results(jsonFile);
 
         % Inserisci nei campi della struct
         results(k).fileName = jsonFiles(k).name;
@@ -31,4 +31,14 @@ function results = process_json_folder(path)
         results(k).labels   = labels;
         results(k).scores   = scores;
     end
+end
+
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+function [boxes,labels,scores] = get_results(jsonFile)
+
+raw = jsondecode(fileread(jsonFile));
+
+labels = raw.labels_3d(:);
+scores = raw.scores_3d(:);
+boxes  = raw.bboxes_3d;  % Nx7: [x y z dx dy dz yaw]
 end

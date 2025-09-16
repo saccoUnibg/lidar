@@ -3,6 +3,11 @@ import subprocess
 import argparse
 
 def run_demo_on_folder(input_path, output_path):
+    
+    print ('--- Run Batch.py ---')
+
+    root_path = '/home/cal/Documents/Cristian_S/mmdetection3d'
+    input_path = os.path.join(root_path,input_path);
 
     # Itero su tutti i file nella cartella di input
     for filename in os.listdir(input_path):
@@ -21,7 +26,8 @@ def run_demo_on_folder(input_path, output_path):
         
         # Costruisco il comando
         cmd = [
-            "python", "demo/pcd_demo.py",
+            "/home/cal/miniconda3/envs/mmdetection3d/bin/python",
+            "demo/pcd_demo.py",
             file_path,
             config_file,
             checkpoint_file,
