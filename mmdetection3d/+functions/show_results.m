@@ -1,41 +1,42 @@
 function show_results(path,results,threshold)
     
     pcdPath = path + "/1_pcd";
-    bboxes = {results.boxes}';
+    bboxes_all = {results.boxes}';
+    scores_all = {results.scores}';
 
     lidarData = fileDatastore(pcdPath,'ReadFcn',@(x) pcread(x));
     reset(lidarData);
     numFiles = size(lidarData.Files,1);
     for i = 1:numFiles
         ptCloud = read(lidarData);
-        bboxes_file = bboxes(i);
-        showPcdWith3dBoxes(ptCloud,bboxes_file);
+        B = bboxes_all{i};   % Nx7
+        S = scores_all{i};   % Nx1
+
+        % 🔹 Filtra solo le box con score > threshold
+        keep = S > threshold;
+        B = B(keep, :);
+
+        showPcdWith3dBoxes(ptCloud, B);
     end
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-function showPcdWith3dBoxes(pcd,bboxes_file)
+function showPcdWith3dBoxes(pcd, B)
+    % --- plot pcd
+    figure; pcshow(pcd); hold on; axis equal; grid on;
+    xlabel X; ylabel Y; zlabel Z; title('Point cloud con bounding boxes');
 
-% --- carica bbox
+    % --- disegna box filtrate
+    for i = 1:size(B,1)
+        c   = B(i,1:3);
+        d   = B(i,4:6);
+        yaw = B(i,7);
 
-B = bboxes_file{1}; % Nx7: [cx cy cz dx dy dz yaw(rad)]
-
-% --- plot pcd
-figure; pcshow(pcd); hold on; axis equal; grid on;
-xlabel X; ylabel Y; zlabel Z; title('Point cloud con bounding boxes');
-
-% --- disegna box
-for i = 1:size(B,1)
-    c   = B(i,1:3);
-    d   = B(i,4:6);
-    yaw = B(i,7); % radianti
-
-    C = orientedBBoxCorners(c, d, yaw); % 8x3
-    drawBox(C, [1 0 0], 1.5);
-end
-hold off;
-
+        C = orientedBBoxCorners(c, d, yaw);
+        drawBox(C, [1 0 0], 1.5);
+    end
+    hold off;
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
