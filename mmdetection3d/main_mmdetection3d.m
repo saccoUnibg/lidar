@@ -66,10 +66,11 @@ results_filtered = functions.filter_cyclist(results);
 
 %% 4a. Show results
 threshold = 0.35;
-functions.show_results(path,results,threshold);
+functions.show_results(path,results_filtered,threshold);
 
 %% 4b. Salvataggio scores modello utilizzato
 % functions.save_scores(results, "SECOND")
 
 %% 5. Estrazione punti interni alla bb
-funtions
+threshold = 0.35;
+functions.extract_points_from_bb(path, results_filtered);

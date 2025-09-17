@@ -1,6 +1,6 @@
 function show_results(path,results,threshold)
     
-    pcdPath = path + "/0_original";
+    pcdPath = path + "/1_pcd";
     bboxes_all = {results.boxes}';
     scores_all = {results.scores}';
     labels_all = {results.labels}';
@@ -22,6 +22,7 @@ function show_results(path,results,threshold)
 
         showPcdWith3dBoxes(ptCloud, B);
     end
+    disp("Show results: --- OK ---")
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
