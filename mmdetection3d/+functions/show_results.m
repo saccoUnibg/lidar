@@ -1,6 +1,6 @@
 function show_results(path,results,threshold)
     
-    pcdPath = path + "/1_pcd";
+    pcdPath = path + "/0_original";
     bboxes_all = {results.boxes}';
     scores_all = {results.scores}';
     labels_all = {results.labels}';

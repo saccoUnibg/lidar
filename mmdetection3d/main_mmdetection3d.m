@@ -30,7 +30,7 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 
 %% Scelta cartella di test da convertire
 % Per Mac:
-path = "/Users/cristiansacco/workspaces/lidar/tests/test99";
+path = "/Users/cristiansacco/workspaces/lidar/tests/test99_1";
 % Per Ubuntu:
 % path = "pcd_tests/test99";
 
@@ -51,15 +51,25 @@ disp("--- Comando python eseguito: " + cmd);
 [status, out] = system(cmd);
 disp(out)
 
-%% 3. import json e proiezione bounding box
+%% 3a. import json e proiezione bounding box
 results = functions.process_json_folder(path);
-
+save("workspace_results.mat");
 %% 3b. import workspace (per lavorare su Mac)
-% ricordati di salvare anche cartella di test
-load("/Users/cristiansacco/workspaces/lidar/mmdetection3d/workspace.mat")
 
-%% 4a. Visualizzazione bb su pcd (da ottimizzare)
-threshold = 0.25;
+
+% ----> !!! ricordati di salvare anche cartella di test !!! <----
+load("workspace_results.mat")
+
+%% 4. Filtro risultati per sola classe Cyclist
+
+results_filtered = functions.filter_cyclist(results);
+
+%% 4a. Show results
+threshold = 0.35;
 functions.show_results(path,results,threshold);
 
-%% 4b. Estrazione punti interni a una bb
+%% 4b. Salvataggio scores modello utilizzato
+% functions.save_scores(results, "SECOND")
+
+%% 5. Estrazione punti interni alla bb
+funtions

@@ -19,9 +19,15 @@ def run_demo_on_folder(input_path, output_path):
 
         print(f"Eseguo su: {file_path}")
 
-        config_file = "configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
+        config_file = "configs/second/second_hv_secfpn_8xb6-amp-80e_kitti-3d-3class.py"
+        #config_file = "configs/centerpoint/centerpoint_voxel0075_second_secfpn_8xb4-cyclic-20e_nus-3d.py"
+        #config_file = "configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
+        #config_file = "configs/parta2/parta2_hv_secfpn_8xb2-cyclic-80e_kitti-3d-3class.py"
         
-        checkpoint_file = "checkpoints/hv_pointpillars_secfpn_6x8_160e_kitti-3d-3class_20220301_150306-37dc2420.pth"
+        checkpoint_file = "checkpoints/hv_second_secfpn_fp16_6x8_80e_kitti-3d-3class_20200925_110059-05f67bdf.pth"
+        #checkpoint_file = "checkpoints/centerpoint_0075voxel_second_secfpn_dcn_circlenms_4x8_cyclic_20e_nus_20220810_025930-657f67e0.pth"
+        #checkpoint_file = "checkpoints/hv_pointpillars_secfpn_6x8_160e_kitti-3d-3class_20220301_150306-37dc2420.pth"
+        #checkpoint_file = "checkpoints/hv_PartA2_secfpn_2x8_cyclic_80e_kitti-3d-3class_20210831_022017-454a5344.pth"
         
         
         # Costruisco il comando
