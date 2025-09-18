@@ -1,5 +1,6 @@
-function extract_points_from_bb(path,results)
+function pcd_list = extract_points_from_bb(path,results)
     
+
     pcdPath = path + "/1_pcd";
     bboxes_all = {results.boxes}';
     scores_all = {results.scores}';
@@ -9,24 +10,39 @@ function extract_points_from_bb(path,results)
     lidarData = fileDatastore(pcdPath,'ReadFcn',@(x) pcread(x));
     reset(lidarData);
     numFiles = size(lidarData.Files,1);
+    pcd_list = cell(numFiles,1);
+
     allPts = [];
+    allIntensities = [];
     for i = 1:numFiles
+
+        fprintf("value of i: %d\n", i)
         ptCloud = read(lidarData);
         B = bboxes_all{i};   % Nx7
         S = scores_all{i};  % Extract scores for the current bounding box
-        
-        B = B(1, :);
-        pcIn = pointsInOrientedBox(ptCloud,B)
+        if ~isempty(B)
+            B = B(1, :);
+        else
+            continue
+        end
+
+        % estraggo point cloud dai punti della bb e la mostro
+        pcIn = pointsInOrientedBox(ptCloud,B);
         figure()
         pcshow(pcIn,"ColorSource","Intensity");
         hold on;
-        if mod(i,4) ==0
+
+        % Estrazione traiettoria
+        if mod(i,3) == 0
             allPts = [allPts; pcIn.Location()];
+            allIntensities = [allIntensities;pcIn.Intensity()];
         end
         
+        pcd_list{i} = pcIn;
+
     end
-    pcFinal = pointCloud(allPts);
-    pcshow (pcFinal);
+    pcFinal = pointCloud(allPts,"Intensity",allIntensities);
+    pcshow(pcFinal);
     disp("Show results: --- OK ---")
 end
 
@@ -54,9 +70,9 @@ function pcInside = pointsInOrientedBox(pcIn, box)
     Plocal = (R.' * (Pxyz.' - C)).';
 
     % test AABB nel frame locale
-    idxInside = abs(Plocal(:,1)) <= halfSizes(1) + 0.5 & ...
-                abs(Plocal(:,2)) <= halfSizes(2) + 0.5 & ...
-                abs(Plocal(:,3)) <= halfSizes(3) + 1;
+    idxInside = abs(Plocal(:,1)) <= halfSizes(1) + 0.25 & ...
+                abs(Plocal(:,2)) <= halfSizes(2) + 0.25 & ...
+                abs(Plocal(:,3)) <= halfSizes(3) + 0.75;
 
     % seleziona subset
     Psel = Pxyz(idxInside, :);

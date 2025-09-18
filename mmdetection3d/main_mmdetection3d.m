@@ -30,7 +30,7 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 
 %% Scelta cartella di test da convertire
 % Per Mac:
-path = "/Users/cristiansacco/workspaces/lidar/tests/test99_1";
+path = "/Users/cristiansacco/workspaces/lidar/tests/test99_second";
 % Per Ubuntu:
 % path = "pcd_tests/test99";
 
@@ -54,23 +54,34 @@ disp(out)
 %% 3a. import json e proiezione bounding box
 results = functions.process_json_folder(path);
 save("workspace_results.mat");
-%% 3b. import workspace (per lavorare su Mac)
 
+%% Workflow -> pointpillars
+% load results + set path + filter results
+clc;clear; close all;
+load("workspaces/workspace_pointpillars.mat")
+path = "/Users/cristiansacco/workspaces/lidar/tests/test99_pointpillars";
+model = "pointpillars"
+% filter cyclists results
+results_filtered = functions.filter_cyclist(results,model);
 
-% ----> !!! ricordati di salvare anche cartella di test !!! <----
-load("workspace_results.mat")
+%% Workflow -> SECOND
+% load results + set path + filter results
+clc;clear; close all;
+load("workspaces/workspace_second.mat")
+path = "/Users/cristiansacco/workspaces/lidar/tests/test99_second";
+model = "second"
 
-%% 4. Filtro risultati per sola classe Cyclist
+results_filtered = functions.filter_cyclist(results,model);
 
-results_filtered = functions.filter_cyclist(results);
-
-%% 4a. Show results
-threshold = 0.35;
+%% Show results
+% show results
+threshold = 0.1;
 functions.show_results(path,results_filtered,threshold);
 
-%% 4b. Salvataggio scores modello utilizzato
-% functions.save_scores(results, "SECOND")
+%% Estrazione punti interni alla bb
+pcd_list = functions.extract_points_from_bb(path, results_filtered);
 
-%% 5. Estrazione punti interni alla bb
-threshold = 0.35;
-functions.extract_points_from_bb(path, results_filtered);
+%% Estrazione velocita'
+% Calculate speed based on extracted points
+speed_data = functions.calculate_speed(pcd_list);
+

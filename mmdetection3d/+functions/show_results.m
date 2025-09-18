@@ -15,29 +15,38 @@ function show_results(path,results,threshold)
         S = scores_all{i};   % Nx1
         L = labels_all{i};
 
-        % 🔹 Filtra solo le box con score > threshold
-        keep = (S > threshold) & (L == 1);
-
-        B = B(keep, :);
-
-        showPcdWith3dBoxes(ptCloud, B);
+        % Filtro per results con detection su pcd, skip altrimenti
+        if ~isempty(S) & S>threshold
+            S = S(1, :);
+        else
+            continue
+        end
+        
+        % Filtro per soglia
+        if S>threshold
+            B = B(1, :);
+        else
+            continue
+        end
+        
+        showPcdWith3dBoxes(ptCloud, B,i);
     end
     disp("Show results: --- OK ---")
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-function showPcdWith3dBoxes(pcd, B)
+function showPcdWith3dBoxes(pcd, B,iter)
 
     % --- plot pcd
     figure; pcshow(pcd); hold on; axis equal; grid on;
-    xlabel X; ylabel Y; zlabel Z; title('Point cloud con bounding boxes');
+    xlabel X; ylabel Y; zlabel Z; title(sprintf('Point cloud con bounding boxes: %d',iter));
 
     % --- disegna box filtrate
     for i = 1:size(B,1)
-        c   = B(i,1:3);
-        d   = B(i,4:6);
-        yaw = B(i,7);
+        c   = B(1:3);
+        d   = B(4:6);
+        yaw = B(7);
 
         C = orientedBBoxCorners(c, d, yaw);
         drawBox(C, [1 0 0], 1.5);
@@ -49,7 +58,9 @@ end
 
 function C = orientedBBoxCorners(center, dims, yaw)
     % center: [cx cy cz], dims: [dx dy dz] (lunghezze lato), yaw rad (intorno a Z)
+
     dx = dims(1)/2; dy = dims(2)/2; dz = dims(3)/2;
+    
     local = [ ...
         -dx -dy -dz;
          dx -dy -dz;
@@ -59,7 +70,10 @@ function C = orientedBBoxCorners(center, dims, yaw)
          dx -dy  dz;
          dx  dy  dz;
         -dx  dy  dz];
-    Rz = [cos(yaw) -sin(yaw) 0; sin(yaw) cos(yaw) 0; 0 0 1];
+    Rz = [  cos(yaw) -sin(yaw)  0;
+            sin(yaw) cos(yaw)   0; 
+            0           0       1];
+
     C = (local * Rz.') + center; % 8x3
 end
 
