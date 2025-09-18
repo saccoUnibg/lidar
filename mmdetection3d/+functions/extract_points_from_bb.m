@@ -1,11 +1,9 @@
-function pcd_list = extract_points_from_bb(path,results)
+function [pcd_list, pcd_traiettoria] = extract_points_from_bb(path,results)
     
 
     pcdPath = path + "/1_pcd";
     bboxes_all = {results.boxes}';
     scores_all = {results.scores}';
-
-
 
     lidarData = fileDatastore(pcdPath,'ReadFcn',@(x) pcread(x));
     reset(lidarData);
@@ -15,9 +13,12 @@ function pcd_list = extract_points_from_bb(path,results)
     allPts = [];
     allIntensities = [];
     for i = 1:numFiles
-
-        fprintf("value of i: %d\n", i)
+        
         ptCloud = read(lidarData);
+        if i == 1
+            allPts = [allPts; ptCloud.Location()];
+            allIntensities = [allIntensities; ptCloud.Intensity()];
+        end
         B = bboxes_all{i};   % Nx7
         S = scores_all{i};  % Extract scores for the current bounding box
         if ~isempty(B)
@@ -26,11 +27,9 @@ function pcd_list = extract_points_from_bb(path,results)
             continue
         end
 
-        % estraggo point cloud dai punti della bb e la mostro
+        % estraggo point cloud punti dentro bb
         pcIn = pointsInOrientedBox(ptCloud,B);
-        figure()
-        pcshow(pcIn,"ColorSource","Intensity");
-        hold on;
+        pcd_list{i} = pcIn;
 
         % Estrazione traiettoria
         if mod(i,3) == 0
@@ -38,11 +37,9 @@ function pcd_list = extract_points_from_bb(path,results)
             allIntensities = [allIntensities;pcIn.Intensity()];
         end
         
-        pcd_list{i} = pcIn;
-
     end
-    pcFinal = pointCloud(allPts,"Intensity",allIntensities);
-    pcshow(pcFinal);
+    pcd_traiettoria = pointCloud(allPts,"Intensity",allIntensities);
+    
     disp("Show results: --- OK ---")
 end
 

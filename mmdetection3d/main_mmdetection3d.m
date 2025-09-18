@@ -75,13 +75,24 @@ results_filtered = functions.filter_cyclist(results,model);
 
 %% Show results
 % show results
+clc; close all;
 threshold = 0.1;
 functions.show_results(path,results_filtered,threshold);
 
-%% Estrazione punti interni alla bb
-pcd_list = functions.extract_points_from_bb(path, results_filtered);
+%% Estrazione punti interni alle bb + pcd traiettoria
+[pcd_list, pcd_traiettoria] = functions.extract_points_from_bb(path, results_filtered);
 
+%% Visualizzazione traiettoria
+functions.show_pcd (pcd_traiettoria,"Traiettoria");
+
+%% Proiezione pcd bici
+for i = 1 : size(pcd_list,1)
+    if ~isempty(pcd_list{i})
+        figure()
+        pcshow(pcd_list{i});
+    end
+end
 %% Estrazione velocita'
 % Calculate speed based on extracted points
-speed_data = functions.calculate_speed(pcd_list);
-
+[speed_array, speed_mean] = functions.calculate_speed(pcd_list);
+disp(speed_mean);

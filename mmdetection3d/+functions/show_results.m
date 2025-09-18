@@ -28,7 +28,8 @@ function show_results(path,results,threshold)
         else
             continue
         end
-        
+        disp("iter:");
+        disp (i);
         showPcdWith3dBoxes(ptCloud, B,i);
     end
     disp("Show results: --- OK ---")
@@ -44,12 +45,15 @@ function showPcdWith3dBoxes(pcd, B,iter)
 
     % --- disegna box filtrate
     for i = 1:size(B,1)
+
         c   = B(1:3);
         d   = B(4:6);
         yaw = B(7);
-
+        disp("Yaw (deg):");
+        disp(rad2deg(yaw));
         C = orientedBBoxCorners(c, d, yaw);
         drawBox(C, [1 0 0], 1.5);
+        iter = iter + 1;
     end
     hold off;
 end
@@ -60,7 +64,7 @@ function C = orientedBBoxCorners(center, dims, yaw)
     % center: [cx cy cz], dims: [dx dy dz] (lunghezze lato), yaw rad (intorno a Z)
 
     dx = dims(1)/2; dy = dims(2)/2; dz = dims(3)/2;
-    
+
     local = [ ...
         -dx -dy -dz;
          dx -dy -dz;

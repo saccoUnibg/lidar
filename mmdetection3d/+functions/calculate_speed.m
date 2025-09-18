@@ -1,19 +1,27 @@
-function speed_data = calculate_speed(pcd_list)
+function [speed_array,speed_mean] = calculate_speed(pcd_list)
+    % 0. Eliminazione righe vuote
+    % 0. Eliminazione righe vuote
+    pcd_list = pcd_list(~cellfun('isempty', pcd_list(:,1)), :);
+
     % 1. Per ogni pcd trovo il centro dei punti;
-    % 2. Salvo il centro in un vettore di centri
-    % 3. Calcolo la distanza e quindi la velocità per ogni segmento
-    % 4. Calcolo velocità media
-    
+    % 2. Salvo il centro in un vettore di centri "centers"
     size_list = size(pcd_list,1);
-    centers = zeros(size_list, 3); % Preallocate for centers
+    centers = zeros(size_list, 3);
     
     for i = 1: size_list
-        if ~isempty(pcd_list{i,1})
-            centers(i, :) = find_center(pcd_list{i,1});
-        end
+        centers(i, :) = find_center(pcd_list{i,1});
     end
-    
-    speed_data = 1;
+
+    % 3. Calcolo la distanza e quindi la velocità per ogni segmento
+    time_interval = 0.05; % 0.1s <-> 10Hz
+    distances = zeros(size_list - 1, 1);
+    speed_array = zeros(size_list - 1, 1);
+    for i = 1:size_list - 1
+        distances(i) = norm(centers(i+1, :) - centers(i, :));
+        speed_array(i) = distances(i)/time_interval;
+    end
+    speed_mean = mean(speed_array);
+    % 4. Calcolo velocità media
     disp("Speed data: --- OK ---")
 end
 
