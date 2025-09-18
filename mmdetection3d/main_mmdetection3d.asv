@@ -94,5 +94,7 @@ end
 %% Estrazione velocita'
 % Calculate speed based on extracted points
 [speed_array, speed_mean] = functions.calculate_speed(pcd_list);
-
-disp("Speed mean: " + speed_mean + " km/h");
+disp ("Speed: mean")
+disp(speed_mean);
+disp ("Speed: array")
+disp()

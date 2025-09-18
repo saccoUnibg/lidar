@@ -69,7 +69,7 @@ function pcInside = pointsInOrientedBox(pcIn, box)
     % test AABB nel frame locale
     idxInside = abs(Plocal(:,1)) <= halfSizes(1) + 0.25 & ...
                 abs(Plocal(:,2)) <= halfSizes(2) + 0.25 & ...
-                abs(Plocal(:,3)) <= halfSizes(3) + 0.75;
+                abs(Plocal(:,3)) <= halfSizes(3) + 1;
 
     % seleziona subset
     Psel = Pxyz(idxInside, :);
