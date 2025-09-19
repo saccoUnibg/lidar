@@ -5,11 +5,6 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 % Ubuntu
 % cd('home/cal/Documents/Cristian_S/mmdetection3d')
 
-% importlib = py.importlib.import_module('importlib');
-% lidarViewer
-% lidarLabeler
-% matlab.codetools.requiredFilesAndProducts('main_mmdetection3d.m')'
-
 %% Struttura folder
 % /mmdetection3d
 %   /tests
@@ -31,7 +26,6 @@ extra_functions.show_pcd_from_path(path);
 path = "/Users/cristiansacco/workspaces/lidar/tests/test99_second";
 % Per Ubuntu:
 % path = "pcd_tests/test99";
-
 %% 0. crop pcd
 functions.crop_pcd_folder(path);
 
@@ -89,9 +83,11 @@ for i = 1 : size(pcd_list,1)
     if ~isempty(pcd_list{i})
         figure()
         pcshow(pcd_list{i});
+        title(sprintf("Indice i: %d",i));
     end
 end
-%% Estrazione velocita'
+
+%% Calcolo velocita'
 % Calculate speed based on extracted points
 [speed_array, speed_mean] = functions.calculate_speed(pcd_list);
 

@@ -16,7 +16,7 @@ function [speed_array,speed_mean] = calculate_speed(pcd_list)
     % 3. Calcolo la distanza e quindi la velocità per ogni segmento
     % 0.1s  <-> 10Hz
     % 0.05s <-> 20Hz
-    f = 10; % 10Hz or 20 Hz
+    f = 10; % 10Hz or 20 Hz -> è possibile usare tale valore data l'estrema precisione del sensore
     
     time_interval = 1/f;
     

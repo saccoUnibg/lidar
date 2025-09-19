@@ -28,8 +28,6 @@ function show_results(path,results,threshold)
         else
             continue
         end
-        disp("iter:");
-        disp (i);
         showPcdWith3dBoxes(ptCloud, B,i);
     end
     disp("Show results: --- OK ---")
@@ -49,8 +47,7 @@ function showPcdWith3dBoxes(pcd, B,iter)
         c   = B(1:3);
         d   = B(4:6);
         yaw = B(7);
-        disp("Yaw (deg):");
-        disp(rad2deg(yaw));
+
         C = orientedBBoxCorners(c, d, yaw);
         drawBox(C, [1 0 0], 1.5);
         iter = iter + 1;
