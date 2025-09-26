@@ -32,7 +32,7 @@ function [pcd_list, pcd_traiettoria] = extract_points_from_bb(path,results)
         pcd_list{i} = pcIn;
 
         % Estrazione traiettoria
-        if mod(i,3) == 0
+        if mod(i,4) == 0
             allPts = [allPts; pcIn.Location()];
             allIntensities = [allIntensities;pcIn.Intensity()];
         end
