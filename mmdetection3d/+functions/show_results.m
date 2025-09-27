@@ -3,7 +3,7 @@ function show_results(path,results,threshold)
     pcdPath = path + "/1_pcd";
     bboxes_all = {results.boxes}';
     scores_all = {results.scores}';
-    labels_all = {results.labels}';
+    % labels_all = {results.labels}';
 
 
     lidarData = fileDatastore(pcdPath,'ReadFcn',@(x) pcread(x));
@@ -13,7 +13,7 @@ function show_results(path,results,threshold)
         ptCloud = read(lidarData);
         B = bboxes_all{i};   % Nx7
         S = scores_all{i};   % Nx1
-        L = labels_all{i};
+        % L = labels_all{i};
 
         % Filtro per results con detection su pcd, skip altrimenti
         if ~isempty(S) & S>threshold
@@ -28,28 +28,44 @@ function show_results(path,results,threshold)
         else
             continue
         end
-        showPcdWith3dBoxes(ptCloud, B,i);
+        showPcdWith3dBoxes(ptCloud, B,S,i);
     end
     disp("Show results: --- OK ---")
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-function showPcdWith3dBoxes(pcd, B,iter)
+function showPcdWith3dBoxes(pcd, B,S,iter)
 
     % --- plot pcd
-    figure; pcshow(pcd); hold on; axis equal; grid on;
+    figure; pcshow(pcd,"ColorSource","Intensity"); hold on; axis equal; grid on;
     xlabel X; ylabel Y; zlabel Z; title(sprintf('Point cloud con bounding boxes: %d',iter));
-
+    
     % --- disegna box filtrate
     for i = 1:size(B,1)
 
         c   = B(1:3);
         d   = B(4:6);
         yaw = B(7);
+        
+        yaw_deg = rad2deg(yaw);
+        if(yaw_deg > 180)
+            yaw = yaw - deg2rad(180);
+        end
 
+        yaw = -yaw;
+        
         C = orientedBBoxCorners(c, d, yaw);
         drawBox(C, [1 0 0], 1.5);
+        % punto sopra la box (sul centro, sopra l'asse z)
+
+        pos = c + [0 0 d(3)/2 + 1.5];  % 0.2 = offset per non sovrapporsi
+        
+        % scritta sopra la box
+        bounding_box_name = "Cyclist: " + num2str(S);
+        text(pos(1), pos(2), pos(3), bounding_box_name, ...
+             'Color','red','FontSize',13, ...
+             'FontWeight','bold', 'HorizontalAlignment','center');
         iter = iter + 1;
     end
     hold off;

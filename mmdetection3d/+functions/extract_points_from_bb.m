@@ -1,4 +1,4 @@
-function [pcd_list, pcd_traiettoria] = extract_points_from_bb(path,results)
+function [pcd_list, pcd_traiettoria,center_list] = extract_points_from_bb(path,results)
     
 
     pcdPath = path + "/1_pcd";
@@ -9,6 +9,7 @@ function [pcd_list, pcd_traiettoria] = extract_points_from_bb(path,results)
     reset(lidarData);
     numFiles = size(lidarData.Files,1);
     pcd_list = cell(numFiles,1);
+    center_list = zeros(numFiles,3);
 
     allPts = [];
     allIntensities = [];
@@ -30,6 +31,9 @@ function [pcd_list, pcd_traiettoria] = extract_points_from_bb(path,results)
         % estraggo point cloud punti dentro bb
         pcIn = pointsInOrientedBox(ptCloud,B);
         pcd_list{i} = pcIn;
+        center_list(i,1) = B(1);
+        center_list(i,2) = B(2);
+        center_list(i,3) = B(3);
 
         % Estrazione traiettoria
         if mod(i,4) == 0
@@ -40,7 +44,7 @@ function [pcd_list, pcd_traiettoria] = extract_points_from_bb(path,results)
     end
     pcd_traiettoria = pointCloud(allPts,"Intensity",allIntensities);
     
-    disp("Show results: --- OK ---")
+    disp("Extract points from BB: --- OK ---")
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

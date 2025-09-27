@@ -30,7 +30,7 @@ if strcmp(model,"second")
             y_new = B(4);
             B(4) = x_new;
             B(5) = y_new;
-
+            B(3)= B(3) + 1.7/2; % altezza sensore per db KITTI
             results_filtered(i).boxes = B;
             results_filtered(i).scores = S;
             results_filtered(i).labels = L;

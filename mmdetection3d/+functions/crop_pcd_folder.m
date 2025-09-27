@@ -51,7 +51,7 @@ function [ptCloudProcessed] = preprocess_pcd(ptCloud)
     % elevation_threshold = 0.05;
     % elevation_threshold = 0.3;
 
-    elevation_threshold = 0.05;
+    elevation_threshold = 0.05; % 5cm da terra
     ptCloud = removeInvalidPoints(ptCloud);
     [~,ptCloudProcessed,~] = segmentGroundSMRF(ptCloud,2,"ElevationThreshold",elevation_threshold);
     
