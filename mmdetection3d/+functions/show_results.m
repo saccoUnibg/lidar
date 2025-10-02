@@ -48,13 +48,6 @@ function showPcdWith3dBoxes(pcd, B,S,iter)
         d   = B(4:6);
         yaw = B(7);
         
-        yaw_deg = rad2deg(yaw);
-        if(yaw_deg > 180)
-            yaw = yaw - deg2rad(180);
-        end
-
-        yaw = -yaw;
-        
         C = orientedBBoxCorners(c, d, yaw);
         drawBox(C, [1 0 0], 1.5);
         % punto sopra la box (sul centro, sopra l'asse z)

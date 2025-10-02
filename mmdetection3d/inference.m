@@ -13,11 +13,13 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 %           /1_pcd
 %           /2_bin
 %           /3_json/preds
+%           "results.mat"
 %       /test01
 %           /0_original
 %           /1_pcd
 %           /2_bin
 %           /3_json/preds
+%           "results.mat"
 %   run_batch.py
 %% 
 extra_functions.show_pcd_from_path(path);
