@@ -1,4 +1,5 @@
 function [speed_array,speed_mean] = calculate_speed(pcd_list)
+    disp("Calculate speed: --- Start ---")
 
     % 1. Per ogni pcd trovo il centro dei punti;
     % 2. Salvo il centro in un vettore di centri "centers"
@@ -41,7 +42,7 @@ function [speed_array,speed_mean] = calculate_speed(pcd_list)
     end
     speed_mean = mean(speed_array);
     % 4. Calcolo velocità media
-    disp("Speed data: --- OK ---")
+    disp("Calculate speed: --- OK ---")
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,5 +1,6 @@
 function [pcd_list, pcd_traiettoria,center_list] = extract_points_from_bb(path,results)
     
+    disp("Extract points from BB: --- Start ---")
 
     pcdPath = path + "/1_pcd";
     bboxes_all = {results.boxes}';

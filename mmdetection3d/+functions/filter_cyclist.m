@@ -1,5 +1,6 @@
 function results_filtered = filter_cyclist(results,model)
-    
+    disp("Filter cyclist: --- Start ---")
+
     results_filtered = results; % copia la struct
     
     for i = 1:length(results)

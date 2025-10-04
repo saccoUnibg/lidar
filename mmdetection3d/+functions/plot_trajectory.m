@@ -1,5 +1,6 @@
 function plot_trajectory(pcd_list,center_list)
-    
+    disp("Plot trajectory: --- Start ---");
+
     % elimino righe pcd_list e center_list vuote
     pcd_list(any(cellfun(@isempty, pcd_list), 2), :) = [];
     center_list(any(center_list == 0, 2), :) = [];

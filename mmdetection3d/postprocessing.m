@@ -14,7 +14,7 @@ clc;clear; close all;
 
 % --- Workspace filename ---
 % workspace_filename = "workspaces/workspace_pointpillars.mat";
-workspace_filename = "workspaces/workspace_17.mat";
+workspace_filename = "workspaces/workspace_11.mat";
 
 load(workspace_filename);
 
@@ -24,7 +24,7 @@ model = "second";
 
 % --- Path ---
 % path = "/Users/cristiansacco/workspaces/lidar/tests/test99_pointpillars";
-path = "/Users/cristiansacco/workspaces/lidar/tests/test17";
+path = "/Users/cristiansacco/workspaces/lidar/tests/test11";
 
 %%  Filter cyclists results
 close all;
@@ -38,40 +38,15 @@ functions.show_results(path,results_filtered,threshold);
 %% Estrazione punti interni alle bb + pcd traiettoria
 [pcd_list, pcd_traiettoria,center_list] = functions.extract_points_from_bb (path, results_filtered);
 
-%% Visualizzazione traiettoria
-figure()
+%% 0. Visualizzazione traiettoria
 functions.plot_trajectory(pcd_list,center_list);
 
 %% 1. Calcolo velocita'
 % Calculate speed based on extracted points
 [speed_array, speed_mean] = functions.calculate_speed(pcd_list);
-
 disp("Speed (mean): " + speed_mean + " km/h");
 
 %% 2. Inclinazione bici
 pcd_ground_list_filtered = functions.calculate_inclination(path,results_filtered, pcd_list);
-%% 3. Classificazione bici corsa/mountain bike
 
-%% ricava lista yaw da results_filtered
-% 
-% boxes_list = {results_filtered.boxes}';
-% scores_list = {results_filtered.scores}';
-% 
-% vector_size = size(boxes_list,1);
-% 
-% yaw_list = zeros(vector_size,3); % Initialize yaw_list
-% 
-% for i = 1 : vector_size
-%     if ~isempty(boxes_list{i})
-%         yaw_value = boxes_list{i}(1,7);
-% 
-%         yaw_value_deg = rad2deg(yaw_value);
-% 
-%         yaw_list(i,1) = yaw_value;              % rad
-%         yaw_list(i,2) = yaw_value_deg;          % deg
-%         yaw_list(i,3) = scores_list{i}(1,1);    % score
-% 
-%     end
-% end
-% 
-% plot(yaw_list(:,2))
+%% 3. Classificazione bici corsa/mountain bike

@@ -1,5 +1,5 @@
 function show_results(path,results,threshold)
-    
+    disp("Show results: --- Start ---")
     pcdPath = path + "/1_pcd";
     bboxes_all = {results.boxes}';
     scores_all = {results.scores}';
