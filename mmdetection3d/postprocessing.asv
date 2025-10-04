@@ -49,7 +49,7 @@ functions.plot_trajectory(pcd_list,center_list);
 disp("Speed (mean): " + speed_mean + " km/h");
 
 %% 2. Inclinazione bici
-pcd_ground_list_filtered = functions.calculate_inclination(path,results_filtered, pcd_list);
+functions.calculate_inclination(path,repcd_list);
 %% 3. Classificazione bici corsa/mountain bike
 
 %% ricava lista yaw da results_filtered

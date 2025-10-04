@@ -11,6 +11,7 @@ function crop_pcd_folder(path)
         for i = 1:numFiles
             ptCloud = read(lidarData);
             ptCloud = crop_pcd(ptCloud);
+            ptCloud = preprocess_pcd(ptCloud);
             pcd_fileName = fullfile(pcdPath, sprintf('pcd_%03d.pcd', i));
             pcwrite(ptCloud,pcd_fileName,"Encoding","ascii");
         end
@@ -22,7 +23,7 @@ end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-function cropped_pcd = crop_pcd(pcd)
+function ptCloud = crop_pcd(pcd)
     xmin = 0.0;     % Minimum value along X-axis.
     xmax = 40;   % Maximum value along X-axis.
     
@@ -40,8 +41,8 @@ function cropped_pcd = crop_pcd(pcd)
                 & pcd.Location(:,3) < zmax ...
                 & pcd.Location(:,3) > zmin); 
     
-    pcd = select(pcd, pos, 'OutputSize', 'full');
-    cropped_pcd = preprocess_pcd(pcd);
+    ptCloud = select(pcd, pos, 'OutputSize', 'full');
+
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

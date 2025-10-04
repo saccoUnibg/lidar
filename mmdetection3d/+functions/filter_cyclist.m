@@ -14,6 +14,8 @@ function results_filtered = filter_cyclist(results,model)
         bboxes_all = {results_filtered.boxes}';
         scores_all = {results_filtered.scores}';
         labels_all = {results_filtered.labels}';
+        
+        B_previous = zeros(7,1);
 
         for i = 1:length(bboxes_all)
             
@@ -35,11 +37,20 @@ function results_filtered = filter_cyclist(results,model)
                 B(5) = y_new;
 
                 B(7) = - B(7);
+
+                if i>1 && abs(B_previous(4) - B(5)) < 0.2 && ~isempty(B_previous)
+                    x_new = B(5);
+                    y_new = B(4);
+                    B(4) = x_new;
+                    B(5) = y_new;
+                end
+
+                B_previous = B;
                 
                 results_filtered(i).boxes = B;
                 results_filtered(i).scores = S;
                 results_filtered(i).labels = L;
-    
+                
             else
                 continue
             end
