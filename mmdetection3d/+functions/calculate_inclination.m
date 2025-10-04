@@ -11,7 +11,7 @@ function ground_equation_list = calculate_inclination(path, results_filtered, pc
 
     % 4. Calcolo equazione piano passante per punti bicicletta
     bike_equation_list = get_bike_equation(pcd_list);
-    plot_pcd_ground(ground_equation_list,pcd_list);
+    plot_pcd_ground(ground_equation_list,bike_equation_list,pcd_list);
     % 5. Calcolo angolo tra piani
 
     disp("Calculate inclination: --- OK ---");
@@ -116,16 +116,6 @@ function ground_equation_list = get_ground_equation(pcd_ground_list_filtered)
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- 3b: creazione funzione obiettivo ----
-function f = funzione_obiettivo(theta, x, y, z)
-    z_hat = theta(1)*x + theta(2)*y + theta(3);
-
-    r = z - z_hat;
-
-    f = sqrt(mean(r.^2));
-end
-
-% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 %  ---- 4 ----
 function bike_equation_list = get_bike_equation(pcd_list)
     
@@ -140,7 +130,7 @@ function bike_equation_list = get_bike_equation(pcd_list)
         y = double(y);
         z = double(z);
 
-        obj = @(theta) funzione_obiettivo(theta, x, y, z);
+        obj = @(theta) funzione_obiettivo(theta, x,y,z);
         
         theta0 = double([0; 0; 0]); % punto iniziale da cui partire per l'ottimizzazione
         theta_ottimi = fmincon(obj,theta0);
@@ -149,33 +139,68 @@ function bike_equation_list = get_bike_equation(pcd_list)
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+%  ---- creazione funzione obiettivo ----
+function f = funzione_obiettivo(theta, x, y, z)
+    z_hat = theta(1)*x + theta(2)*y + theta(3);
+
+    r = z - z_hat;
+
+    f = sqrt(mean(r.^2));
+end
+
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 %  ---- Extra ----
 % Plot esempio
-function plot_pcd_ground(ground_equation_list,pcd_list)
+function plot_pcd_ground(ground_equation_list, bike_equation_list, pcd_list)
     close all;
-    for i = 1 : size(pcd_list,1)
-        figure(i)
+    for i = 1 : size(pcd_list,1)   % se pcd_list è cella colonna; altrimenti usa numel(pcd_list)
+        figure(i); clf;
         pcd = pcd_list{i};
         pts = pcd.Location();
-        pcshow(pcd,"ColorSource","Intensity");
+
+        % nuvola di punti
+        pcshow(pcd, "ColorSource", "Intensity");
         hold on;
-        % piano terreno
-        vector1 = ground_equation_list(i,:);
-        a = vector1(1); b = vector1(2); c = vector1(3);
-        xrange = linspace(min(pts(:,1)), max(pts(:,1)) , 20);
+
+        % griglia comune per entrambi i piani (copre l'estensione dei punti)
+        xrange = linspace(min(pts(:,1)), max(pts(:,1)), 20);
         yrange = linspace(min(pts(:,2)), max(pts(:,2)), 20);
-        
         [xg, yg] = meshgrid(xrange, yrange);
-        zg = a*xg + b*yg + c;
-        
-        surf(xg, yg, zg, 'FaceAlpha',0.8, 'EdgeColor','none');
-        colormap parula
+
+        % ===== piano terreno: z = a*x + b*y + c =====
+        g = ground_equation_list(i,:);
+        a1 = g(1); b1 = g(2); c1 = g(3);
+        zg = a1*xg + b1*yg + c1;
+
+        hGround = surf(xg, yg, zg, ...
+            'FaceAlpha', 0.55, ...
+            'EdgeColor','none', ...
+            'FaceColor', [0.20 0.70 0.30]);   % verde
+
+        % ===== piano bici: z = a*x + b*y + c =====
+        bq = bike_equation_list(i,:);
+        if all(isfinite(bq)) && numel(bq) >= 3
+            a2 = bq(1); b2 = bq(2); c2 = bq(3);
+            zb = a2*xg + b2*yg + c2;
+
+            hBike = surf(xg, yg, zb, ...
+                'FaceAlpha', 0.45, ...
+                'EdgeColor','none', ...
+                'FaceColor', [0.85 0.33 0.10]);  % arancio/rosso
+        else
+            hBike = [];   % niente piano bici in questo frame
+        end
+
+        % estetica
         xlabel('X'); ylabel('Y'); zlabel('Z');
-        title(sprintf('Bici + piano: (i: %d)',i));
-        grid on; view(3);
-        % piano bicicletta
+        title(sprintf('Piani terreno & bici + PCD (i = %d)', i));
+        grid on; view(3); axis tight; daspect([1 1 1]);
 
-
-
+        % legenda (mostra solo gli handle validi)
+        L = ["Terreno","Bici"];
+        H = [hGround, hBike];
+        H = H(~arrayfun(@isempty,H));     % rimuove vuoti
+        L = L(1:numel(H));
+        if ~isempty(H), legend(H, L, 'Location','best'); end
     end
 end
