@@ -150,11 +150,11 @@ function f = funzione_obiettivo(theta, x, y, z)
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- Extra ----
-% Plot esempio
+%  ---- Extra: plot piani + pcd ----
+
 function plot_pcd_ground(ground_equation_list, bike_equation_list, pcd_list)
     
-    for i = 1 : size(pcd_list,1)   % se pcd_list è cella colonna; altrimenti usa numel(pcd_list)
+    for i = 10 : 12
         figure(i); clf;
         pcd = pcd_list{i};
         pts = pcd.Location();
@@ -187,20 +187,18 @@ function plot_pcd_ground(ground_equation_list, bike_equation_list, pcd_list)
             hBike = surf(xg, yg, zb, ...
                 'FaceAlpha', 0.45, ...
                 'EdgeColor','none', ...
-                'FaceColor', [0.85 0.33 0.10]);  % arancio/rosso
+                'FaceColor', [0.85 0.33 0.10]);
         else
             hBike = [];   % niente piano bici in questo frame
         end
 
-        % estetica
         xlabel('X'); ylabel('Y'); zlabel('Z');
         title(sprintf('Piani terreno & bici + PCD (i = %d)', i));
         grid on; view(3); axis tight; daspect([1 1 1]);
 
-        % legenda (mostra solo gli handle validi)
         L = ["Terreno","Bici"];
         H = [hGround, hBike];
-        H = H(~arrayfun(@isempty,H));     % rimuove vuoti
+        H = H(~arrayfun(@isempty,H));
         L = L(1:numel(H));
         if ~isempty(H), legend(H, L, 'Location','best'); end
     end
