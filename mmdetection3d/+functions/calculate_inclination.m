@@ -1,7 +1,7 @@
-function ground_equation_list = calculate_inclination(path, results_filtered, pcd_list)
-    disp("Calculate inclination: --- OK ---");
+function [ground_equation_list, bike_equation_list, angle_list] = calculate_inclination(path, results_filtered, pcd_list)
+    disp("Calculate inclination: --- Start ---");
 
-    % 1. segmentazione punti del terreno
+    % 1. Segmentazione punti del terreno
     ground_list = segment_ground(path);
 
     % 2. Filtro punti terreno appartenenti alla sola bounding box
@@ -41,7 +41,7 @@ function pcd_ground_list = segment_ground(path)
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- 2 ----
+%  ---- 2. Filtro punti terreno appartenenti alla sola bounding box ----
 function pcd_ground_list_filtered = filter_ground_points(ground_list,results_filtered)
 
     numFiles = size(results_filtered,2);
@@ -51,7 +51,10 @@ function pcd_ground_list_filtered = filter_ground_points(ground_list,results_fil
         B = results_filtered(i).boxes;
             % --- parse box ---
         cx = B(1); cy = B(2); cz = B(3);
-        sx = B(4); sy = B(5); sz = B(6);
+
+        sx = B(4)*(1+0.1); % allargo 10% la bb
+        sy = B(5)*(1+0.1);
+        sz = B(6)*(1+0.1);
         yaw = B(7);
     
         C = [cx; cy; cz];
@@ -86,8 +89,7 @@ function pcd_ground_list_filtered = filter_ground_points(ground_list,results_fil
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- 3 ----
-
+%  ---- 3. Calcolo equazione piano terreno ----
 function ground_equation_list = get_ground_equation(pcd_ground_list_filtered)
     numFiles = size(pcd_ground_list_filtered,1);
     ground_equation_list = zeros(numFiles,3); % ogni equazione ha 3 parametri

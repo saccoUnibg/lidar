@@ -18,5 +18,6 @@ function plot_trajectory(pcd_list,center_list)
     center_list(all(center_list==0,2),:) = [];
     plot3(center_list(:,1), center_list(:,2), center_list(:,3),'r-', 'LineWidth', 2);
     hold off;
+    title("Trajectory")
     disp("Plot trajectory: --- OK ---");
 end

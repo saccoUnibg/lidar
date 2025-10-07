@@ -13,17 +13,14 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 clc;clear; close all;
 
 % --- Workspace filename ---
-% workspace_filename = "workspaces/workspace_pointpillars.mat";
 workspace_filename = "workspaces/workspace_11.mat";
 
 load(workspace_filename);
 
 % --- Model name ---
-% model = "pointpillars"
 model = "second";
 
 % --- Path ---
-% path = "/Users/cristiansacco/workspaces/lidar/tests/test99_pointpillars";
 path = "/Users/cristiansacco/workspaces/lidar/tests/test11";
 
 %%  Filter cyclists results
@@ -41,12 +38,33 @@ functions.show_results(path,results_filtered,threshold);
 %% 0. Visualizzazione traiettoria
 functions.plot_trajectory(pcd_list,center_list);
 
-%% 1. Calcolo velocita'
-% Calculate speed based on extracted points
+%% 1. Analisi dinamica: Calcolo velocita'
 [speed_array, speed_mean] = functions.calculate_speed(pcd_list);
-disp("Speed (mean): " + speed_mean + " km/h");
 
-%% 2. Inclinazione bici
-pcd_ground_list_filtered = functions.calculate_inclination(path,results_filtered, pcd_list);
+%% 2. Analisi statica: Inclinazione bici
+[ground_equation_list, bike_equation_list, angle_list] = functions.calculate_inclination(path,results_filtered, pcd_list);
 
-%% 3. Classificazione bici corsa/mountain bike
+%% 3. Classificazione 2 features: bici corsa/mountain bike
+close all;
+pcd_prova = pcd_list{20};
+pcshow(pcd_prova)
+hold on;
+
+pts = pcd_prova.Location();
+        xrange = linspace(min(pts(:,1)), max(pts(:,1)), 20);
+        yrange = linspace(min(pts(:,2)), max(pts(:,2)), 20);
+        [xg, yg] = meshgrid(xrange, yrange);
+
+
+zg = 0.5*xg + 0.5*yg;
+
+hGround = surf(xg, yg, zg, ...
+    'FaceAlpha', 0.55, ...
+    'EdgeColor','none', ...
+    'FaceColor', [0.20 0.70 0.30]);   % verde
+
+axis on
+grid on
+xlabel('X (m)');
+ylabel('Y (m)');
+zlabel('Z (m)');

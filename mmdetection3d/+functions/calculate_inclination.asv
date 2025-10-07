@@ -1,7 +1,7 @@
-function ground_equation_list = calculate_inclination(path, results_filtered, pcd_list)
-    disp("Calculate inclination: --- OK ---");
+function [angle_list, ground_equation_list, bike_equation_list] = calculate_inclination(path, results_filtered, pcd_list)
+    disp("Calculate inclination: --- Start ---");
 
-    % 1. segmentazione punti del terreno
+    % 1. Segmentazione punti del terreno
     ground_list = segment_ground(path);
 
     % 2. Filtro punti terreno appartenenti alla sola bounding box
@@ -12,15 +12,18 @@ function ground_equation_list = calculate_inclination(path, results_filtered, pc
 
     % 4. Calcolo equazione piano passante per punti bicicletta
     bike_equation_list = get_bike_equation(pcd_list);
-    plot_pcd_ground(ground_equation_list,bike_equation_list,pcd_list);
-    % 5. Calcolo angolo tra piani
 
+    % 4b. Plot piani + pcd
+    plot_pcd_ground(ground_equation_list,bike_equation_list,pcd_list);
+
+    % 5. Calcolo angolo tra piani
+    angle_list = evaluate_angle(ground_equation_list,bike_equation_list)
+    
     disp("Calculate inclination: --- OK ---");
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-%  ---- 1 ----
+%  ---- 1. Segmentazione punti del terreno ----
 function pcd_ground_list = segment_ground(path)
     
     pcdPath = path + "/0_original";
@@ -41,7 +44,7 @@ function pcd_ground_list = segment_ground(path)
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- 2 ----
+%  ---- 2. Filtro punti terreno appartenenti alla sola bounding box ----
 function pcd_ground_list_filtered = filter_ground_points(ground_list,results_filtered)
 
     numFiles = size(results_filtered,2);
@@ -86,8 +89,7 @@ function pcd_ground_list_filtered = filter_ground_points(ground_list,results_fil
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- 3 ----
-
+%  ---- 3. Calcolo equazione piano terreno ----
 function ground_equation_list = get_ground_equation(pcd_ground_list_filtered)
     numFiles = size(pcd_ground_list_filtered,1);
     ground_equation_list = zeros(numFiles,3); % ogni equazione ha 3 parametri
@@ -117,35 +119,66 @@ function ground_equation_list = get_ground_equation(pcd_ground_list_filtered)
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- 4 ----
+%  ---- 4. Calcolo equazione piano passante per punti bicicletta ----
 function bike_equation_list = get_bike_equation(pcd_list)
-    
+
     numFiles = size(pcd_list,1);
     bike_equation_list = zeros(numFiles,3); % ogni equazione ha 3 parametri
+
+    % Valore soglia per il vincolo
+    K = atand(60)^2; % <-- cambia con il valore che vuoi
+
     for i = 1 : numFiles
         pcd = pcd_list{i};
-        
-        model = pcfitplane(pcd,0.015,'MaxNumTrials',)
+        pts = pcd.Location();
+        x = pts(:,1); y = pts(:,2); z = pts(:,3);
+
+        x = double(x);
+        y = double(y);
+        z = double(z);
+
+        % Funzione obiettivo
+        obj = @(theta) funzione_obiettivo(theta, x, y, z);
+
+        % Vincolo non lineare: theta(1)^2 + theta(2)^2 >= K
+        nonlcon = @(theta) vincolo_norma(theta, K);
+
+        % Punto iniziale
+        theta0 = [0; 0; 0];
+
+        % Opzioni (puoi personalizzare)
+        opts = optimoptions('fmincon','Display','none','Algorithm','interior-point');
+
+        % Ottimizzazione
+        theta_ottimi = fmincon(obj, theta0, [], [], [], [], [], [], nonlcon, opts);
+
         bike_equation_list(i,:) = theta_ottimi;
     end
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- creazione funzione obiettivo ----
-function f = funzione_obiettivo(theta, x, y, z)
+%  ---- Creazione funzione obiettivo ----
+function f_obb = funzione_obiettivo(theta, x, y, z)
     z_hat = theta(1)*x + theta(2)*y + theta(3);
 
     r = z - z_hat;
 
-    f = sqrt(mean(r.^2));
+    f_obb = sqrt(mean(r.^2));
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- Extra ----
-% Plot esempio
+%  ---- Vincolo non lineare ----
+function [c, ceq] = vincolo_norma(theta, K)
+    % c(theta) <= 0  →  vincolo disuguaglianza
+    c = K - (theta(1)^2 + theta(2)^2);  % garantisce che la somma sia >= K
+    ceq = []; % nessun vincolo di uguaglianza
+end
+
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+%  ---- 4b. Plot piani + pcd ----
 function plot_pcd_ground(ground_equation_list, bike_equation_list, pcd_list)
-    
-    for i = 1 : size(pcd_list,1)   % se pcd_list è cella colonna; altrimenti usa numel(pcd_list)
+    for i = 1 : size(ground_equation_list,1)
+        % hold on;
         figure(i); clf;
         pcd = pcd_list{i};
         pts = pcd.Location();
@@ -169,7 +202,7 @@ function plot_pcd_ground(ground_equation_list, bike_equation_list, pcd_list)
             'EdgeColor','none', ...
             'FaceColor', [0.20 0.70 0.30]);   % verde
 
-        % ===== piano bici: z = a*x + b*y + c =====
+        % ===== piano bici: z = a2*x + b2*y + c2 =====
         bq = bike_equation_list(i,:);
         if all(isfinite(bq)) && numel(bq) >= 3
             a2 = bq(1); b2 = bq(2); c2 = bq(3);
@@ -178,21 +211,25 @@ function plot_pcd_ground(ground_equation_list, bike_equation_list, pcd_list)
             hBike = surf(xg, yg, zb, ...
                 'FaceAlpha', 0.45, ...
                 'EdgeColor','none', ...
-                'FaceColor', [0.85 0.33 0.10]);  % arancio/rosso
+                'FaceColor', [0.85 0.33 0.10]);
         else
             hBike = [];   % niente piano bici in questo frame
         end
 
-        % estetica
         xlabel('X'); ylabel('Y'); zlabel('Z');
         title(sprintf('Piani terreno & bici + PCD (i = %d)', i));
         grid on; view(3); axis tight; daspect([1 1 1]);
 
-        % legenda (mostra solo gli handle validi)
         L = ["Terreno","Bici"];
         H = [hGround, hBike];
-        H = H(~arrayfun(@isempty,H));     % rimuove vuoti
+        H = H(~arrayfun(@isempty,H));
         L = L(1:numel(H));
         if ~isempty(H), legend(H, L, 'Location','best'); end
     end
+end
+
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+%  ---- 5. Evaluate angle list between ground and cyclist ----
+function angle_list = evaluate_angle(ground_equation_list,bike_equation_list)
+    angle_list = 0;
 end

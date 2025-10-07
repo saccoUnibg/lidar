@@ -42,6 +42,7 @@ function [speed_array,speed_mean] = calculate_speed(pcd_list)
     end
     speed_mean = mean(speed_array);
     % 4. Calcolo velocità media
+    disp("Speed (mean): " + speed_mean + " km/h");
     disp("Calculate speed: --- OK ---")
 end
 
