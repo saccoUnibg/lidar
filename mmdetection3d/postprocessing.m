@@ -13,7 +13,7 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 clc;clear; close all;
 
 % --- Workspace filename ---
-workspace_filename = "workspaces/workspace_11.mat";
+workspace_filename = "workspaces/workspace_15.mat";
 
 load(workspace_filename);
 
@@ -21,7 +21,7 @@ load(workspace_filename);
 model = "second";
 
 % --- Path ---
-path = "/Users/cristiansacco/workspaces/lidar/tests/test11";
+path = "/Users/cristiansacco/workspaces/lidar/tests/test15";
 
 %%  Filter cyclists results
 close all;
@@ -42,29 +42,10 @@ functions.plot_trajectory(pcd_list,center_list);
 [speed_array, speed_mean] = functions.calculate_speed(pcd_list);
 
 %% 2. Analisi statica: Inclinazione bici
+clc;close all;
 [ground_equation_list, bike_equation_list, angle_list] = functions.calculate_inclination(path,results_filtered, pcd_list);
 
 %% 3. Classificazione 2 features: bici corsa/mountain bike
-close all;
-pcd_prova = pcd_list{20};
-pcshow(pcd_prova)
-hold on;
-
-pts = pcd_prova.Location();
-        xrange = linspace(min(pts(:,1)), max(pts(:,1)), 20);
-        yrange = linspace(min(pts(:,2)), max(pts(:,2)), 20);
-        [xg, yg] = meshgrid(xrange, yrange);
 
 
-zg = 0.5*xg + 0.5*yg;
-
-hGround = surf(xg, yg, zg, ...
-    'FaceAlpha', 0.55, ...
-    'EdgeColor','none', ...
-    'FaceColor', [0.20 0.70 0.30]);   % verde
-
-axis on
-grid on
-xlabel('X (m)');
-ylabel('Y (m)');
-zlabel('Z (m)');
+%% 999. Misc
