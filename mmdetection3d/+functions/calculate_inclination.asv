@@ -336,8 +336,8 @@ function plot_pcd_ground_sequence(ground_equation_list, bike_equation_list, pcd_
             title(sprintf('Piani terreno & bici + PCD (i = %d)\n angle: %.2f', i, angle_list(i)));
             grid on; view(3); axis tight; daspect([1 1 1]);
     
-            z_minimo = min(z_minimo,min(pts(:,3)) - 0.5);
-            z_massimo = max(z_massimo,max(pts(:,3)) + 0.5);
+            z_minimo = min(z_minimo,min(pts(:,3))) - 0.5;
+            z_massimo = max(z_massimo,max(pts(:,3))) + 0.5;
 
             zlim([z_minimo z_massimo]);
             L = ["Terreno","Bici"];
@@ -347,7 +347,4 @@ function plot_pcd_ground_sequence(ground_equation_list, bike_equation_list, pcd_
             if ~isempty(H), legend(H, L, 'Location','best'); end
         end
     end
-    
-    zlim([z_minimo z_massimo]);
-
 end
