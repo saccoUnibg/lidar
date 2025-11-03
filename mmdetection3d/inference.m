@@ -47,4 +47,4 @@ disp(out)
 
 %% 3a. import json e proiezione bounding box
 results = functions.process_json_folder(path);
-save("workspace_"+filename(end-2:end)+".mat");
+save("workspaces/workspace_"+path(end-2:end)+".mat");
