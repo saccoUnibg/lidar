@@ -24,9 +24,9 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 %% 
 extra_functions.show_pcd_from_path(path);
 %% Scelta cartella di test da convertire
-% Per Mac:
+% Mac:
 path = "/Users/cristiansacco/workspaces/lidar/tests/test17";
-% Per Ubuntu:
+% Ubuntu:
 % path = "pcd_tests/test99";
 %% 0. crop pcd
 functions.crop_pcd_folder(path);
