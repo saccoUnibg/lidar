@@ -13,7 +13,7 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 clc;clear; close all;
 
 % --- Workspace filename ---
-workspace_filename = "workspaces/workspace_15.mat";
+workspace_filename = "workspaces/workspace_10.mat";
 
 load(workspace_filename);
 
@@ -21,19 +21,19 @@ load(workspace_filename);
 model = "second";
 
 % --- Path ---
-path = "/Users/cristiansacco/workspaces/lidar/tests/test15";
+path = "/Users/cristiansacco/workspaces/lidar/tests/pcd_tests_mtb/test10";
 
 %%  Filter cyclists results
 close all;
-results_filtered = functions.filter_cyclist(results,model);
+threshold = 0.3;
+results_filtered = functions.filter_cyclist(results,model,threshold);
 
 %% Show results
 close all;
-threshold = 0.1;
 functions.show_results(path,results_filtered,threshold);
 
 %% Estrazione punti interni alle bb + pcd traiettoria
-[pcd_list, pcd_traiettoria,center_list] = functions.extract_points_from_bb (path, results_filtered);
+[pcd_list, pcd_traiettoria,center_list] = functions.extract_points_from_bb(path, results_filtered);
 
 %% 0. Visualizzazione traiettoria
 functions.plot_trajectory(pcd_list,center_list);

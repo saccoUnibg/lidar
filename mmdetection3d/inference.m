@@ -3,7 +3,7 @@ clc;clear; close all;
 % Mac
 cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 % Ubuntu
-% cd('home/cal/Documents/Cristian_S/mmdetection3d')
+% cd('/home/cal/Documents/Cristian_S/mmdetection3d')
 
 %% Struttura folder
 % /mmdetection3d
@@ -21,13 +21,13 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 %           /3_json/preds
 %           "results.mat"
 %   run_batch.py
-%% 
-extra_functions.show_pcd_from_path(path);
 %% Scelta cartella di test da convertire
 % Mac:
-path = "/Users/cristiansacco/workspaces/lidar/tests/test17";
+path = "/Users/cristiansacco/workspaces/lidar/tests/pcd_tests_mtb/test10";
 % Ubuntu:
 % path = "pcd_tests/test99";
+%% visualizzazione pcd cartella
+extra_functions.show_pcd_from_path(path);
 %% 0. crop pcd
 functions.crop_pcd_folder(path);
 

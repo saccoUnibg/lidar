@@ -1,4 +1,4 @@
-function results_filtered = filter_cyclist(results,model)
+function results_filtered = filter_cyclist(results,model,threshold)
     disp("Filter cyclist: --- Start ---")
 
     results_filtered = results; % copia la struct
@@ -59,6 +59,17 @@ function results_filtered = filter_cyclist(results,model)
     end
     % Normalizzo yaw
     results_filtered = normalize_yaw(results_filtered);
+    
+    % elimino righe per cui scores e' inferiore alla threshold
+    % Eliminate entries with scores below the threshold
+        for i = length(results_filtered):-1:1
+            if results_filtered(i).scores < threshold
+                results_filtered(i).boxes = []; % Remove entry
+                results_filtered(i).labels = []; % Remove entry
+                results_filtered(i).scores = []; % Remove entry
+
+            end
+        end
 
     disp("Filter cyclist: --- OK ---")
 end

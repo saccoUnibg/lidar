@@ -17,7 +17,7 @@ function [ground_equation_list, bike_equation_list, angle_list] = calculate_incl
     angle_list = evaluate_angle(ground_equation_list,bike_equation_list);
 
     %plot_pcd_ground_single(ground_equation_list, bike_equation_list, pcd_list,angle_list);
-    %plot_pcd_ground_sequence(ground_equation_list,bike_equation_list,pcd_list,angle_list);
+    plot_pcd_ground_sequence(ground_equation_list,bike_equation_list,pcd_list,angle_list);
 
 
     disp("Calculate inclination: --- OK ---");
@@ -140,7 +140,7 @@ function bike_equation_list = get_bike_equation(pcd_list)
         % points = pcd.Location;
         if ~isempty(pcd)
             figure(i);
-            pcshow(pcd,"ColorSource","Intensity");
+            % pcshow(pcd,"ColorSource","Intensity");
             bike_pcd = get_bike_pcd(pcd);
             
             maxDistance = 0.1;
@@ -290,7 +290,7 @@ end
 function plot_pcd_ground_sequence(ground_equation_list, bike_equation_list, pcd_list,angle_list)
     z_minimo = 999;
     z_massimo = -999;
-    for i = 1 : size(pcd_list,1)
+    for i = 1 : 3 : size(pcd_list,1)
         pcd = pcd_list{i};
         if ~isempty(pcd)
 
