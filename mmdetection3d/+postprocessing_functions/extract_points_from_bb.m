@@ -15,7 +15,8 @@ function [pcd_list, pcd_traiettoria,center_list] = extract_points_from_bb(path,r
     allPts = [];
     allIntensities = [];
     for i = 1:numFiles
-        
+        disp("Index: ");
+        disp(i);
         ptCloud = read(lidarData);
         elevation_threshold = 0.05; % 5cm da terra
         ptCloud = removeInvalidPoints(ptCloud);

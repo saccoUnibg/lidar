@@ -18,6 +18,10 @@ function plot_trajectory(pcd_list,center_list)
     center_list(all(center_list==0,2),:) = [];
     plot3(center_list(:,1), center_list(:,2), center_list(:,3),'r-', 'LineWidth', 2);
     hold off;
+
+    set(gcf,'color','w');
+    set(gca,'color','w');
+    set(gca, 'XColor', [0.15 0.15 0.15], 'YColor', [0.15 0.15 0.15], 'ZColor', [0.15 0.15 0.15])
     title("Trajectory")
     disp("Plot trajectory: --- OK ---");
 end

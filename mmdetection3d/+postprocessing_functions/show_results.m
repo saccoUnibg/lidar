@@ -1,4 +1,4 @@
-function show_results(path,results,threshold)
+function show_results(path,results,threshold,lim)
     disp("Show results: --- Start ---")
     pcdPath = path + "/1_pcd";
     bboxes_all = {results.boxes}';
@@ -8,15 +8,15 @@ function show_results(path,results,threshold)
 
     lidarData = fileDatastore(pcdPath,'ReadFcn',@(x) pcread(x));
     reset(lidarData);
-    numFiles = size(lidarData.Files,1);
-    for i = 1:numFiles
+    numFiles = size(lidarData.Files,1) - lim;
+    for i = 1 : numFiles
         ptCloud = read(lidarData);
         B = bboxes_all{i};   % Nx7
         S = scores_all{i};   % Nx1
         % L = labels_all{i};
 
         % Filtro per results con detection su pcd, skip altrimenti
-        if ~isempty(S) & S>threshold
+        if ~isempty(S) & S > threshold
             S = S(1, :);
         else
             continue
@@ -62,6 +62,9 @@ function showPcdWith3dBoxes(pcd, B,S,iter)
         iter = iter + 1;
     end
     hold off;
+    set(gcf,'color','w');
+    set(gca,'color','w');
+    set(gca, 'XColor', [0.15 0.15 0.15], 'YColor', [0.15 0.15 0.15], 'ZColor', [0.15 0.15 0.15])
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

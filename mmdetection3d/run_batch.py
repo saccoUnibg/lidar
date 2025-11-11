@@ -32,7 +32,7 @@ def run_demo_on_folder(input_path, output_path):
         
         # Costruisco il comando
         cmd = [
-            "/home/cal/miniconda3/envs/mmdetection3d/bin/python",
+            "/home/cal/miniconda3/envs/mmdet3d/bin/python",
             "demo/pcd_demo.py",
             file_path,
             config_file,

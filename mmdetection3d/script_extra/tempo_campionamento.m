@@ -5,7 +5,6 @@ csv_path = path + "/0_csv";
 
 files = dir(fullfile(csv_path, '*.csv'));
 
-
 allData = cell(numel(files),1);
 
 for k = 1:numel(files)

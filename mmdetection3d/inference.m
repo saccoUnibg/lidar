@@ -23,22 +23,22 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 %   run_batch.py
 %% Scelta cartella di test da convertire
 % Mac:
-path = "/Users/cristiansacco/workspaces/lidar/tests/pcd_tests_mtb/test10";
+path_pcd = "/Users/cristiansacco/workspaces/lidar/tests/pcd_tests_mtb/test10";
 % Ubuntu:
 % path = "pcd_tests/test99";
 %% visualizzazione pcd cartella
-extra_functions.show_pcd_from_path(path);
+inference_functions.show_pcd_from_path(path_pcd);
 %% 0. crop pcd
-functions.crop_pcd_folder(path);
+inference_functions.crop_pcd_folder(path_pcd);
 
 %% 1. Export .pcd -> .bin
-functions.export_bin_files(path);
+inference_functions.export_bin_files(path_pcd);
 
 %% 2. Inferenza: script ".py"
 % [status, out] = system('python3 prova.py --input "Hello World!" ');
 
-input_path = path + "/2_bin";
-output_path = path + "/3_json";
+input_path = path_pcd + "/2_bin";
+output_path = path_pcd + "/3_json";
 
 cmd = " python3 run_batch.py --input " + input_path + " --output " + output_path;
 disp("--- Comando python eseguito: " + cmd);
@@ -46,5 +46,5 @@ disp("--- Comando python eseguito: " + cmd);
 disp(out)
 
 %% 3a. import json e proiezione bounding box
-results = functions.process_json_folder(path);
-save("workspaces/workspace_"+path(end-2:end)+".mat");
+results = inference_functions.process_json_folder(path_pcd);
+save("workspaces/workspace_" + extractAfter(path, strlength(path) - 2) + ".mat");
