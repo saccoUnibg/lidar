@@ -21,17 +21,21 @@ function bike_pcd = get_bike_pcd(pcd)
     z = P(:,3);
 
     I = pcd.Intensity;
-    if isempty(I), I = zeros(size(z)); end
+
+    if isempty(I)
+        I = zeros(size(z));
+    end
+    
     I = double(I(:));
 
-    % Feature: [Z, Intensity] standardizzate
+    % Feature: [Z, Intensity] normalizzate
     zf = (z - mean(z)) / std(z);
     If = (I - mean(I)) / max(std(I), eps);
     X = [zf, If];
 
     % k-means con risultato riproducibile
     rng(1);
-    idx = kmeans(X, 2, 'Replicates', 5, 'MaxIter', 500, 'Start', 'plus');
+    idx = kmeans(X, 2, 'Replicates', 5, 'MaxIter', 1000, 'Start', 'plus');
 
     % Decidi quale cluster è la bici: quello con Z media più bassa
     muZ = [mean(z(idx==1)), mean(z(idx==2))];
@@ -46,5 +50,5 @@ function bike_pcd = get_bike_pcd(pcd)
     hold on;
     figure;
     pcshow(bike_pcd,"ColorSource","Intensity","MarkerSize",20);
-    
+
 end

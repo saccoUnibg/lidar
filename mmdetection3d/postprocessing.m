@@ -48,8 +48,9 @@ postprocessing_functions.plot_trajectory(pcd_list,center_list);
 %% 2. Analisi statica: Inclinazione bici
 clc;close all;
 [ground_equation_list, bike_equation_list, angle_list] = postprocessing_functions.calculate_inclination(path,results_filtered, pcd_list);
-
+%% plot each pcd with planes
 postprocessing_functions.plot_pcd_ground_single(ground_equation_list, bike_equation_list, pcd_list,angle_list);
+%% plot all pcd with planes
 postprocessing_functions.plot_pcd_ground_sequence(ground_equation_list,bike_equation_list,pcd_list,angle_list);
 %% 3. Classificazione 2 features: bici corsa/mountain bike
 postprocessing_functions.classification(path,results_filtered,pcd_list);
