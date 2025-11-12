@@ -38,16 +38,19 @@ postprocessing_functions.show_results(path,results_filtered,threshold,lim);
 %% Estrazione punti interni alle bb + pcd traiettoria
 [pcd_list, pcd_traiettoria,center_list] = postprocessing_functions.extract_points_from_bb(path, results_filtered);
 
-%% 0. Visualizzazione traiettoria
+%% 0. Visualizzazione traiettoria + calcolo distanza percorsa
 close all;
-postprocessing_functions.plot_trajectory(pcd_list,center_list);
+postprocessing_functions.get_trajectory(pcd_list,center_list);
 
-%% 1. Analisi dinamica: Calcolo velocita'
-[speed_array, speed_mean] = postprocessing_functions.calculate_speed(pcd_list);
+%% 1. Analisi dinamica: Calcolo velocita' e distanza percorsa
+[covered_distance, speed_array, speed_max,speed_mean] = postprocessing_functions.get_distance_and_speed(pcd_list);
+disp("Covered Distance: " + covered_distance + " m");
+disp("Speed (max): " + speed_max + " km/h");
+disp("Speed (mean): " + speed_mean + " km/h");
 
 %% 2. Analisi statica: Inclinazione bici
 clc;close all;
-[ground_equation_list, bike_equation_list, angle_list] = postprocessing_functions.calculate_inclination(path,results_filtered, pcd_list);
+[ground_equation_list, bike_equation_list, angle_list] = postprocessing_functions.get_inclination(path,results_filtered, pcd_list);
 %% plot each pcd with planes
 postprocessing_functions.plot_pcd_ground_single(ground_equation_list, bike_equation_list, pcd_list,angle_list);
 %% plot all pcd with planes

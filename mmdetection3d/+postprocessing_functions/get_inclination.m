@@ -1,4 +1,4 @@
-function [ground_equation_list, bike_equation_list, angle_list] = calculate_inclination(path, results_filtered, pcd_list)
+function [ground_equation_list, bike_equation_list, angle_list] = get_inclination(path, results_filtered, pcd_list)
     disp("Calculate inclination: --- Start ---");
 
     % 1. Segmentazione punti del terreno
