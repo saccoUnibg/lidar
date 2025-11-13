@@ -135,7 +135,7 @@ function bike_equation_list = get_bike_equation(pcd_list)
         pcd = pcd_list{i};
         % points = pcd.Location;
         if ~isempty(pcd)
-            figure(i);
+            % figure(i);
             % pcshow(pcd,"ColorSource","Intensity");
             bike_pcd = get_bike_pcd(pcd);
             

@@ -8,14 +8,14 @@ function get_trajectory(pcd_list,center_list)
 
     for i = 1: size(pcd_list,1)
 
-        if mod(i,2)==0
+        % if mod(i,2)==0
             pcshow(pcd_list{i},"ColorSource","Intensity");
             hold on;
-        else
-            center_list(i,:) = [0];
-        end
+        % else
+            % center_list(i,:) = [0];
+        % end
     end
-    center_list(all(center_list==0,2),:) = [];
+    % center_list(all(center_list==0,2),:) = [];
     plot3(center_list(:,1), center_list(:,2), center_list(:,3),'r-', 'LineWidth', 2);
     hold off;
 
