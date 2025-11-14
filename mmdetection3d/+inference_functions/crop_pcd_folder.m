@@ -11,9 +11,9 @@ function crop_pcd_folder(path)
         for i = 1:numFiles
             ptCloud = read(lidarData);
             ptCloud = crop_pcd(ptCloud);
-            ptCloud = preprocess_pcd(ptCloud);
+            ptCloudProcessed = preprocess_pcd(ptCloud);
             pcd_fileName = fullfile(pcdPath, sprintf('pcd_%03d.pcd', i));
-            pcwrite(ptCloud,pcd_fileName,"Encoding","ascii");
+            pcwrite(ptCloudProcessed,pcd_fileName,"Encoding","ascii");
         end
         disp(" Crop pcd folder: --- OK ---")
     else

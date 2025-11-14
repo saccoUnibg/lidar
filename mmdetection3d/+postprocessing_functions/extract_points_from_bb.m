@@ -2,7 +2,7 @@ function [pcd_list, pcd_traiettoria,center_list] = extract_points_from_bb(path,r
     
     disp("Extract points from BB: --- Start ---")
 
-    pcdPath = path + "/1_pcd";
+    pcdPath = path + "/0_original";
     bboxes_all = {results.boxes}';
     scores_all = {results.scores}';
 
@@ -15,8 +15,14 @@ function [pcd_list, pcd_traiettoria,center_list] = extract_points_from_bb(path,r
     allPts = [];
     allIntensities = [];
     for i = 1:numFiles
-        
+        disp("Index: ");
+        disp(i);
         ptCloud = read(lidarData);
+        elevation_threshold = 0.05; % 5cm da terra
+        ptCloud = removeInvalidPoints(ptCloud);
+        [~,ptCloud,~] = segmentGroundSMRF(ptCloud,2,"ElevationThreshold",elevation_threshold);
+
+
         if i == 1
             allPts = [allPts; ptCloud.Location()];
             allIntensities = [allIntensities; ptCloud.Intensity()];
@@ -74,7 +80,7 @@ function pcInside = pointsInOrientedBox(pcIn, box)
     % test AABB nel frame locale
     idxInside = abs(Plocal(:,1)) <= halfSizes(1) + 0.25 & ...
                 abs(Plocal(:,2)) <= halfSizes(2) + 0.25 & ...
-                abs(Plocal(:,3)) <= halfSizes(3) + 1;
+                abs(Plocal(:,3)) <= halfSizes(3) + 0.5;
 
     % seleziona subset
     Psel = Pxyz(idxInside, :);

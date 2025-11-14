@@ -1,4 +1,4 @@
-function [speed_array,speed_mean] = calculate_speed(pcd_list)
+function [covered_distance, speed_array,speed_max,speed_mean] = get_distance_and_speed(pcd_list)
     disp("Calculate speed: --- Start ---")
 
     % 1. Per ogni pcd trovo il centro dei punti;
@@ -34,14 +34,18 @@ function [speed_array,speed_mean] = calculate_speed(pcd_list)
             continue;
         end
         count = 1;
-        distances(i) = norm(centers(i+1, :) - centers(i, :));
-
+        distances(i) = norm(c1 - c2);
+        
         speed_array(i) = distances(i)/(time_interval*count);
         speed_array(i) = speed_array(i) * 3.66;
-
+        
     end
+
+    % 4. Calcolo velocità media e distanza percorsa
     speed_mean = mean(speed_array);
-    % 4. Calcolo velocità media
+    speed_max = max(speed_array);
+    covered_distance = sum(distances);
+    
     disp("Calculate speed: --- OK ---")
 end
 

@@ -38,7 +38,7 @@ function export_bin_files(path)
             disp(" Export bin files: --- OK ---")
 
         catch ME
-            rmdir(fullPath,'s');
+            rmdir(binPath,'s');
             disp("Errore nella creazione files .bin, ripetere l'operazione");
             disp(ME.message);
         end

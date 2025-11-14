@@ -1,10 +1,9 @@
 clc;clear; close all;
 
-path = "/Users/cristiansacco/workspaces/lidar/tests/test99_second";
+path = "/Users/cristiansacco/workspaces/lidar/tests/bici_corsa/test01";
 csv_path = path + "/0_csv";
 
 files = dir(fullfile(csv_path, '*.csv'));
-
 
 allData = cell(numel(files),1);
 
