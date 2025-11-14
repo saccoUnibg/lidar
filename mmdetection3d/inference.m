@@ -27,7 +27,7 @@ path_pcd = "/Users/cristiansacco/workspaces/lidar/tests/pcd_tests_mtb/test10";
 % Ubuntu:
 % path = "pcd_tests/test99";
 %% visualizzazione pcd cartella
-inference_functions.show_pcd_from_path(path_pcd);
+inference_functions.show_pcd_from_path(path_pcd + "/0_original");
 %% 0. crop pcd
 inference_functions.crop_pcd_folder(path_pcd);
 

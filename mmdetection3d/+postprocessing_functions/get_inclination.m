@@ -5,6 +5,7 @@ function [ground_equation_list, bike_equation_list, angle_list] = get_inclinatio
     ground_list = segment_ground(path);
 
     % 2. Filtro punti terreno appartenenti alla sola bounding box
+    % (punti sottostanti la bici e ciclista)
     pcd_ground_list_filtered = filter_ground_points(ground_list,results_filtered);
 
     % 3. Calcolo equazione piano terreno

@@ -91,7 +91,7 @@ function results_filtered = normalize_yaw(results_filtered)
 
         end
     end
-    plot(yaw_list(:,1))
+    % plot(yaw_list(:,1))
 
     % 2. Applico normalizzazione e plotto per vedere differenza con quello
     % precedente
@@ -122,10 +122,10 @@ function results_filtered = normalize_yaw(results_filtered)
         yaw_prev = yaw_temp;
     end
     
-    hold on;
-    plot(yaw_list(:,1))
+    % hold on;
+    % plot(yaw_list(:,1))
 
-    legend("Non normalizzata","Normalizzata")
+    % legend("Non normalizzata","Normalizzata")
     % 3. Inserisco dentro risultato il valore corretto in rad
     for i = 1:size(yaw_list,1)
         if ~isempty(boxes_list{i})
