@@ -1,0 +1,33 @@
+%% pcshow point cloud generica
+
+pcshow("/Users/cristiansacco/workspaces/lidar/")
+
+
+%% Selezione test
+root = '/Users/cristiansacco/workspaces/lidar/mmdetection3d';
+cd(root)
+clc;clear; close all;
+
+test = "10";
+bike_type = "bici_corsa";
+%bike_type = "mtb";
+path = "../tests/" + bike_type + "/test" + test;
+%% Show pcd with index (faster way) - Raw data
+
+% mtb, test03, frame 28
+
+pcd_index = 95;
+path1 = "/Users/cristiansacco/workspaces/lidar/tests/bici_corsa/test10/0_original";
+
+lidarData = fileDatastore(path1,'ReadFcn',@(x) pcread(x));
+reset(lidarData);
+numFiles = size(lidarData.Files,1);
+
+for i = 1 : numFiles
+    pointCloud = lidarData.read();
+    if i~=pcd_index
+        continue
+    end
+    extra_functions.show_pcd(pointCloud,"Point cloud ");
+end
+

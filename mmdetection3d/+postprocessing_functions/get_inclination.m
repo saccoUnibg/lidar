@@ -163,16 +163,16 @@ function angle_list = evaluate_angle(ground_equation_list,bike_equation_list)
             abcd_g = ground_equation_list(i,1:3);
             abcd_b = bike_equation_list(i,1:3);
 
-            ng = abcd_g / norm(abcd_g);
-            nb = abcd_b / norm(abcd_b);
+            % ng = abcd_g / norm(abcd_g);
+            % nb = abcd_b / norm(abcd_b);
 
-            alpha = atan2d(norm(cross(ng, nb)), abs(dot(ng, nb)));  % angolo tra le normali
+            alpha = atan2d(norm(cross(abcd_g, abcd_b)), abs(dot(abcd_g, abcd_b)));  % angolo tra le normali
             theta = 90 - alpha; 
             angle_list(i) = theta;
         end
 end
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- Extra: creazione funzione obiettivo ----
+%  ---- 3b: creazione funzione obiettivo ----
 function f = funzione_obiettivo(theta, x, y, z)
     z_hat = theta(1)*x + theta(2)*y + theta(3);
 
@@ -182,7 +182,7 @@ function f = funzione_obiettivo(theta, x, y, z)
 end
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-%  ---- Extra: segmentazione bici vs ciclista tramite intensità point cloud ----
+%  ---- 4b: segmentazione bici vs ciclista tramite intensità point cloud ----
 
 function bike_pcd = get_bike_pcd(pcd)
 % Restituisce:
@@ -208,6 +208,10 @@ function bike_pcd = get_bike_pcd(pcd)
     % Decidi quale cluster è la bici: quello con Z media più bassa
     muZ = [mean(z(idx==1)), mean(z(idx==2))];
     [~, bikeLbl] = min(muZ);
+    
+    % remove points on the half upper part
+    
+
 
     % RIMAPPA: bici -> 1, rider -> 2 (etichette stabili)
     idx_remap = ones(size(idx));

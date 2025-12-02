@@ -1,3 +1,4 @@
 tests/
 example/dataset/
 mmdetection3d/pcd_classification/
+temp/

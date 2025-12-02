@@ -1,5 +1,4 @@
 function crop_pcd_folder(path)
-
     originalPath = path + "/0_original";
     pcdPath = path + "/1_pcd";
 
@@ -20,9 +19,7 @@ function crop_pcd_folder(path)
         warning("Cartella gia' presente: %s",pcdPath);
     end
 end
-
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 function ptCloud = crop_pcd(pcd)
     xmin = 0.0;     % Minimum value along X-axis.
     xmax = 40;   % Maximum value along X-axis.
@@ -42,16 +39,15 @@ function ptCloud = crop_pcd(pcd)
                 & pcd.Location(:,3) > zmin); 
     
     ptCloud = select(pcd, pos, 'OutputSize', 'full');
-
 end
-
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 function [ptCloudProcessed] = preprocess_pcd(ptCloud)
     
     % elevation_threshold = 0.05;
     % elevation_threshold = 0.3;
-
+    % downsample and denoise ptCloud
+    ptCloud = pcdownsample(ptCloud, 'gridAverage', 0.1); % Downsample the point cloud
+    ptCloud = pcdenoise(ptCloud); % Denoise the point cloud
     elevation_threshold = 0.05; % 5cm da terra
     ptCloud = removeInvalidPoints(ptCloud);
     [~,ptCloudProcessed,~] = segmentGroundSMRF(ptCloud,2,"ElevationThreshold",elevation_threshold);

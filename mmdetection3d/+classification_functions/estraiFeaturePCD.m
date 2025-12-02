@@ -1,5 +1,5 @@
 function [X, y, featureNames, info] = estraiFeaturePCD(rootDir)
-% ESTRAIFEATUREPCD Estrae feature da tutte le PCD nel dataset
+% ESTRAIFEATUREPCD Estrae feature da tutte le PCD *_bike nel dataset
 %
 %   [X, y, featureNames, info] = classification_functions.estraiFeaturePCD(rootDir)
 %
@@ -15,7 +15,8 @@ function [X, y, featureNames, info] = estraiFeaturePCD(rootDir)
 %   info          - struct array con informazioni su ogni campione
 %                   (classe, testFolder, fileName, fullPath)
 %
-% Richiede Computer Vision Toolbox (pcread).
+% NOTA:
+%   Considera SOLO i file che terminano con *_bike.pcd
 
     if nargin < 1
         rootDir = 'pcd_classification';
@@ -53,8 +54,10 @@ function [X, y, featureNames, info] = estraiFeaturePCD(rootDir)
             testName = testDirs(it).name;
             testFolder = fullfile(classFolder, testName);
 
-            % tutti i file pcd
-            pcdFiles = dir(fullfile(testFolder, '*.pcd'));
+            % --- MODIFICA QUI ---
+            % prima: pcdFiles = dir(fullfile(testFolder, '*.pcd'));
+            % adesso prendo solo i file *_bike.pcd
+            pcdFiles = dir(fullfile(testFolder, '*_filtered.pcd'));
 
             for ip = 1:numel(pcdFiles)
                 fileName = pcdFiles(ip).name;
@@ -99,17 +102,12 @@ function feat = calcolaFeaturePointCloud(ptCloud)
 %   feat.names  - cell array con i nomi delle feature
 %   feat.values - vettore riga con i valori corrispondenti
 %
-% Feature pensate per ~1400 PCD totali:
+% Feature usate:
 %   - nPoints
 %   - centroid_x,y,z
-%   - bbox_dx, bbox_dy, bbox_dz
 %   - bbox_volume
 %   - point_density = nPoints / bbox_volume
-%   - autovalori lambda1,2,3 (covarianza)
-%   - linearity, planarity, scattering, omnivariance,
-%     anisotropy, eigenentropy
 %   - meanZ, stdZ, minZ, maxZ
-%   - horizontal_extent (XY), slenderness, flatness
 
     % estraggo le coordinate (N x 3)
     P = ptCloud.Location;
@@ -127,7 +125,7 @@ function feat = calcolaFeaturePointCloud(ptCloud)
     end
 
     % ---------------------------
-    % 1) feature semplici
+    % 1) feature geometriche base
     % ---------------------------
     nPoints   = size(P,1);
     centroid  = mean(P,1);          % [cx, cy, cz]
@@ -135,64 +133,15 @@ function feat = calcolaFeaturePointCloud(ptCloud)
     maxP      = max(P,[],1);
     bboxSize  = maxP - minP;        % [dx, dy, dz]
     bboxVol   = prod(bboxSize);
+
     if bboxVol <= 0
         bboxVol = eps;
     end
+
     pointDensity = nPoints / bboxVol;
 
-    % XY extent e rapporti forma
-    rangeX = bboxSize(1);
-    rangeY = bboxSize(2);
-    height = bboxSize(3);
-
-    horizontalExtent = sqrt(rangeX^2 + rangeY^2);
-    if horizontalExtent <= 0
-        horizontalExtent = eps;
-    end
-
-    slenderness = height / horizontalExtent;       % alto vs largo
-    flatness    = horizontalExtent / (height+eps); % "sdraiato"
-
     % ---------------------------
-    % 2) feature PCA/covarianza
-    % ---------------------------
-    C = cov(P);                     % matrice 3x3
-    [~,D] = eig(C);
-    lambda = sort(diag(D), 'descend');  % lambda1 >= lambda2 >= lambda3
-
-    % correzione numerica
-    lambda(lambda < 0) = 0;
-
-    % normalizzo per somma = 1 (per alcune misure)
-    lambdaSum = sum(lambda);
-    if lambdaSum == 0
-        lambdaNorm = [1; 0; 0];
-    else
-        lambdaNorm = lambda / lambdaSum;
-    end
-
-    lambda1 = lambda(1);
-    lambda2 = lambda(2);
-    lambda3 = lambda(3);
-
-    % shape features
-    if lambda1 <= 0
-        linearity    = 0;
-        planarity    = 0;
-        scattering   = 0;
-        omnivariance = 0;
-        anisotropy   = 0;
-    else
-        linearity    = (lambda1 - lambda2) / lambda1;
-        planarity    = (lambda2 - lambda3) / lambda1;
-        scattering   = lambda3 / lambda1;
-        omnivariance = (lambda1*lambda2*lambda3)^(1/3);
-        anisotropy   = (lambda1 - lambda3) / lambda1;
-    end
-    eigenentropy = -sum(lambdaNorm .* log(lambdaNorm + eps));
-
-    % ---------------------------
-    % 3) feature lungo z (altezza)
+    % 2) feature lungo z (altezza)
     % ---------------------------
     z = P(:,3);
     meanZ = mean(z);
@@ -201,19 +150,14 @@ function feat = calcolaFeaturePointCloud(ptCloud)
     maxZ  = max(z);
 
     % ---------------------------
-    % costruisco il vettore finale
+    % vettore finale (ordine = names)
     % ---------------------------
     feat.values = [ ...
         nPoints, ...
         centroid, ...                 % cx, cy, cz
-        bboxSize, ...                 % dx, dy, dz
         bboxVol, ...
         pointDensity, ...
-        lambda1, lambda2, lambda3, ...
-        linearity, planarity, scattering, ...
-        omnivariance, anisotropy, eigenentropy, ...
-        meanZ, stdZ, minZ, maxZ, ...
-        horizontalExtent, slenderness, flatness ...
+        meanZ, stdZ, minZ, maxZ ...
     ];
 end
 
@@ -224,13 +168,8 @@ function names = definisciNomiFeature()
     names = { ...
         'nPoints', ...
         'centroid_x', 'centroid_y', 'centroid_z', ...
-        'bbox_dx', 'bbox_dy', 'bbox_dz', ...
         'bbox_volume', ...
         'point_density', ...
-        'lambda1', 'lambda2', 'lambda3', ...
-        'linearity', 'planarity', 'scattering', ...
-        'omnivariance', 'anisotropy', 'eigenentropy', ...
-        'meanZ', 'stdZ', 'minZ', 'maxZ', ...
-        'horizontal_extent', 'slenderness', 'flatness' ...
+        'meanZ', 'stdZ', 'minZ', 'maxZ' ...
     };
 end

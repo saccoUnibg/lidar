@@ -186,11 +186,3 @@ legend('Speed (km/h)', 'Smoothed Speed');
 
 %%
 
-% remove NaN lean angle list values and plot them
-lean_angle_list = angle_list(~isnan(angle_list)); % Remove NaN values from angle list
-figure(4);
-plot(lean_angle_list, 'LineWidth', 1.5);
-ylabel('Lean Angle (degrees)');
-xlabel('Frames');
-title('Lean Angle Over Time');
-grid on;

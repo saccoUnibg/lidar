@@ -2,6 +2,11 @@
 clc; clear; close all;
 root = '/Users/cristiansacco/workspaces/lidar/mmdetection3d/pcd_classification';
 stats = classification_functions.countPCD(root);
+
+%% 00. salvataggio pcd sola bici tramite kmeans
+classification_functions.batchExtractBikePCD(root)
+%%
+pcshow("/Users/cristiansacco/workspaces/lidar/mmdetection3d/pcd_classification/bici_corsa/test06/pcd_bike_054_bike.pcd","ColorSource","Intensity")
 %% 1. estrazione features
 [X, y, featureNames, info] = classification_functions.estraiFeaturePCD(root);
 

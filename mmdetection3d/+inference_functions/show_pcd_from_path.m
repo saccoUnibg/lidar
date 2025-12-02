@@ -6,10 +6,11 @@ function show_pcd_from_path(path)
     for i = 1 : numFiles
         figure(i);
         pointCloud = lidarData.read();
-        pcshow(pointCloud);
-        title(['Point Cloud from File ' num2str(i)]);
+        pcshow(pointCloud,"ColorSource","Intensity","MarkerSize",20);
+        set(gcf,'color','w');
+        set(gca,'color','w');
+        set(gca, 'XColor', [0.15 0.15 0.15], 'YColor', [0.15 0.15 0.15], 'ZColor', [0.15 0.15 0.15])
         hold on;
-
     end
 
 end

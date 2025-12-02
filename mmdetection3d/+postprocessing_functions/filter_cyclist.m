@@ -4,10 +4,14 @@ function results_filtered = filter_cyclist(results,model,threshold)
     results_filtered = results; % copia la struct
     
     for i = 1:length(results)
-        ind = results(i).labels == 1;
-        results_filtered(i).boxes = results(i).boxes(ind, :);
-        results_filtered(i).scores = results(i).scores(ind);
-        results_filtered(i).labels = results(i).labels(ind);
+        ind_cyclist = results(i).labels == 1;
+        ind_pedestrian = results(i).labels == 0;
+        % remove from results_filtered where score of pedestrian is higher
+        % than cyclist one
+        
+        results_filtered(i).boxes = results(i).boxes(ind_cyclist, :);
+        results_filtered(i).scores = results(i).scores(ind_cyclist);
+        results_filtered(i).labels = results(i).labels(ind_cyclist);
     end
     
     % invert x and y of bb
