@@ -1,4 +1,4 @@
-function [covered_distance, speed_array,speed_max,speed_mean] = get_distance_and_speed(pcd_list)
+function [covered_distance, speed_array,speed_max,speed_mean,distances] = get_distance_and_speed(pcd_list)
     disp("Calculate speed: --- Start ---")
 
     % 1. Per ogni pcd trovo il centro dei punti;

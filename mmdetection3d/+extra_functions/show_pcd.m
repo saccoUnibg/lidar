@@ -29,7 +29,7 @@ function show_pcd(ptCloud, title_pcd)
 
     colormap(ax, turbo);
 
-        set(gcf,'color','w');
+    set(gcf,'color','w');
     set(gca,'color','w');
     set(gca, 'XColor', [0.15 0.15 0.15], 'YColor', [0.15 0.15 0.15], 'ZColor', [0.15 0.15 0.15])
 end

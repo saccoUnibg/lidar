@@ -15,7 +15,7 @@ clc;clear; close all;
 
 test = "10";
 bike_type = "bici_corsa";
-% bike_type = "mtb";
+%bike_type = "mtb";
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -49,7 +49,7 @@ else
 end
 
 % --- Gestione Traiettoria Ideale ---
-checkbox = 1;
+checkbox = 0;
 hIdeal = []; 
 
 if checkbox == 1
@@ -72,12 +72,12 @@ end
 
 % 1. IMPOSTAZIONE LABEL ASSI (Nomi e Grandezza)
 % Scriviamo esplicitamente i nomi degli assi (puoi cambiare 'X', 'Y', 'Z' se vuoi altro)
-xlabel(ax, 'X [m]', 'FontSize', 20, 'FontWeight', 'bold');
-ylabel(ax, 'Y [m]', 'FontSize', 20, 'FontWeight', 'bold');
-zlabel(ax, 'Z [m]', 'FontSize', 20, 'FontWeight', 'bold');
+xlabel(ax, 'X [m]', 'FontSize', 60, 'FontWeight', 'bold');
+ylabel(ax, 'Y [m]', 'FontSize', 60, 'FontWeight', 'bold');
+zlabel(ax, 'Z [m]', 'FontSize', 60, 'FontWeight', 'bold');
 
 % Ingrandiamo anche i numeri sugli assi (ticks)
-ax.FontSize = 14; 
+ax.FontSize = 30; 
 ax.FontWeight = 'bold';
 grid(ax, 'on'); % Griglia attiva per leggere meglio
 
@@ -98,7 +98,7 @@ end
 
 if ~isempty(linesToLegend)
     lgd = legend(linesToLegend, namesToLegend);
-    lgd.FontSize = 16;        % Grandezza testo legenda
+    lgd.FontSize = 40;        % Grandezza testo legenda
     lgd.Location = 'best';    % Posizione ottimale
 end
 %% 2. Analisi dinamica: Calcolo velocita' e distanza percorsa
@@ -117,11 +117,13 @@ postprocessing_functions.plot_pcd_ground_single(ground_equation_list, bike_equat
 %% 3b. plot all pcd with planes
 clc;close all;
 postprocessing_functions.plot_pcd_ground_sequence(ground_equation_list,bike_equation_list,pcd_list,angle_list);
-%% 4. Classificazione 2 features: bici corsa/mountain bike
-
-postprocessing_functions.classification(path,results_filtered,pcd_list);
+%% 4. Show pcd split by kmeans
+% test 06, mtb, frame 21 -> per separare bici e ciclista
+% test01, mtb, frame 26 +
+index = 38;
+postprocessing_functions.split_pcd(pcd_list,index);
 %% 000. Extra: Show results bounding box in point cloud
-close all;
+
 lim = 0;
 postprocessing_functions.show_results(path,results_filtered,threshold,lim);
 %% 000: Extra: Mostrare pcd solo ciclista + bici
@@ -163,26 +165,98 @@ pts_sizes(pts_sizes == 0) = [];
 
 yyaxis left
 plot(distance_list, 'LineWidth', 1.5)
-ylabel('Distanza dal centro')
+ylabel('Distance','FontSize',30)
 
 yyaxis right
 plot(pts_sizes, 'LineWidth', 1.5)
-ylabel('Numero di punti')
+ylabel('Number of points','FontSize',30)
 
-xlabel('Tempo')
-title('Relazione distanza e numero di punti')
+xlabel('Frames','FontSize',30)
+title('Relationship between number of points and distance over frames')
 
 % 3. grafico velocità
-% Calcolo velocità media e massima
-figure (3)
-plot(speed_array, 'LineWidth', 1.5)
-ylabel('Speed (km/h)')
-xlabel('Frames')
-% aggiunta di linea che descrive meglio l'array di punti come curva
-% Aggiunta di una linea che descrive meglio l'array di punti come curva
+% 1. PULIZIA DATI
+% Creiamo una maschera che tiene solo i valori che NON sono NaN E NON sono Zero
+valid_mask = ~isnan(speed_array) & (speed_array ~= 0);
+speed_clean = speed_array(valid_mask);
+
+% 2. CALCOLO MEDIA MOBILE (Trend)
+% 'window' determina quanto è liscia la curva.
+window = 15; 
+speed_trend = movmean(speed_clean, window);
+
+% 3. GRAFICO
+figure('Name', 'Speed Analysis', 'Color', 'w');
 hold on;
-plot(smooth(speed_array), 'LineWidth', 2, 'Color', 'g');
-legend('Speed (km/h)', 'Smoothed Speed');
+
+% A) Dati Grezzi (Puliti da 0 e NaN) - Linea sottile azzurra
+plot(speed_clean, 'LineWidth', 1.5, 'Color', [0.6 0.7 1], ...
+    'DisplayName', 'Raw Speed');
+
+% B) Media Mobile (Andamento) - Linea spessa VERDE
+plot(speed_trend, 'LineWidth', 4, 'Color', [0 0.8 0], ...
+    'DisplayName', 'Smoothed Trend');
+
+hold off;
+
+% 4. FORMATTAZIONE "BIG FONT"
+ylabel('Speed (km/h)', 'FontSize', 30, 'FontWeight', 'bold');
+xlabel('Valid Samples', 'FontSize', 30, 'FontWeight', 'bold'); 
+% Nota: ho messo "Samples" perché rimuovendo gli zeri l'asse X non è più esattamente il "Frame" temporale originale
+
+% Ingrandiamo i numeri sugli assi e la griglia
+ax = gca;
+ax.FontSize = 20;        % Numeri sui righelli
+ax.LineWidth = 1.5;      % Spessore righelli
+ax.FontWeight = 'bold';
+grid on;
+
+% Legenda grande
+lgd = legend('show');
+lgd.FontSize = 24;
+lgd.Location = 'best';
 
 %%
+close all;
+% remove 90 degrees lean angle list and NaN values and plot them
+close all;
+
+% 1. Filtra i dati (come prima)
+lean_angle_list = angle_list(~isnan(angle_list) & abs(angle_list) < 90); 
+
+% 2. Crea il vettore delle X (frames)
+frames = 1:length(lean_angle_list);
+
+% --- METODO: Media Mobile con funzione base ---
+span = 10; % Numero di punti su cui fare la media (più alto = più liscio)
+trend_curve = movmean(lean_angle_list, span); 
+
+% --- PLOT ---
+figure(4);
+hold on;
+
+% A) Disegna i dati grezzi (Raw) in grigio chiaro
+plot(frames, lean_angle_list, ...
+    'Color', [0.7, 0.7, 0.7], ... 
+    'LineWidth', 1, ...
+    'LineStyle', '-', ...
+    'DisplayName', 'Raw Data');
+
+% B) Disegna la curva smussata (Trend) in rosso
+plot(frames, trend_curve, ...
+    'Color', 'r', ...             
+    'LineWidth', 2.5, ...         
+    'DisplayName', 'Smoothed Trend');
+
+hold off;
+
+% --- FORMATTAZIONE ---
+ylabel('Lean Angle (degrees)', 'FontSize', 30, 'FontWeight', 'bold');
+xlabel('Frames', 'FontSize', 30, 'FontWeight', 'bold');
+title('Lean Angle Analysis', 'FontSize', 30, 'FontWeight', 'bold');
+grid on;
+legend('show', 'FontSize', 24, 'Location', 'best');
+
+xlim([1, length(lean_angle_list)]);
+
 

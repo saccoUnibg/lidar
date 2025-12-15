@@ -13,9 +13,9 @@ root = '/Users/cristiansacco/workspaces/lidar/mmdetection3d';
 cd(root)
 clc;clear; close all;
 
-test = "10";
+test = "12";
 bike_type = "bici_corsa";
-% bike_type = "mtb";
+%bike_type = "mtb";
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -28,7 +28,7 @@ model = "second";
 root = '/Users/cristiansacco/workspaces/lidar/mmdetection3d';
 % Filter cyclists results
 close all;
-threshold = 0.4;
+threshold = 0.2;
 results_filtered = postprocessing_functions.filter_cyclist(results,model,threshold);
 % Estrazione punti interni alle bb + pcd traiettoria
 [pcd_list, pcd_traiettoria,center_list] = postprocessing_functions.extract_points_from_bb(path, results_filtered);
@@ -49,7 +49,7 @@ else
 end
 
 % --- Gestione Traiettoria Ideale ---
-checkbox = 1;
+checkbox = 0;
 hIdeal = []; 
 
 if checkbox == 1
@@ -72,12 +72,12 @@ end
 
 % 1. IMPOSTAZIONE LABEL ASSI (Nomi e Grandezza)
 % Scriviamo esplicitamente i nomi degli assi (puoi cambiare 'X', 'Y', 'Z' se vuoi altro)
-xlabel(ax, 'X [m]', 'FontSize', 20, 'FontWeight', 'bold');
-ylabel(ax, 'Y [m]', 'FontSize', 20, 'FontWeight', 'bold');
-zlabel(ax, 'Z [m]', 'FontSize', 20, 'FontWeight', 'bold');
+xlabel(ax, 'X [m]', 'FontSize', 60, 'FontWeight', 'bold');
+ylabel(ax, 'Y [m]', 'FontSize', 60, 'FontWeight', 'bold');
+zlabel(ax, 'Z [m]', 'FontSize', 60, 'FontWeight', 'bold');
 
 % Ingrandiamo anche i numeri sugli assi (ticks)
-ax.FontSize = 14; 
+ax.FontSize = 30; 
 ax.FontWeight = 'bold';
 grid(ax, 'on'); % Griglia attiva per leggere meglio
 
@@ -98,11 +98,11 @@ end
 
 if ~isempty(linesToLegend)
     lgd = legend(linesToLegend, namesToLegend);
-    lgd.FontSize = 16;        % Grandezza testo legenda
+    lgd.FontSize = 40;        % Grandezza testo legenda
     lgd.Location = 'best';    % Posizione ottimale
 end
 %% 2. Analisi dinamica: Calcolo velocita' e distanza percorsa
-[covered_distance, speed_array, speed_max,speed_mean] = postprocessing_functions.get_distance_and_speed(pcd_list);
+[covered_distance, speed_array, speed_max,speed_mean,distances] = postprocessing_functions.get_distance_and_speed(pcd_list);
 disp("Covered Distance: " + covered_distance + " m");
 disp("Speed (max): " + speed_max + " km/h");
 disp("Speed (mean): " + speed_mean + " km/h");
@@ -117,11 +117,13 @@ postprocessing_functions.plot_pcd_ground_single(ground_equation_list, bike_equat
 %% 3b. plot all pcd with planes
 clc;close all;
 postprocessing_functions.plot_pcd_ground_sequence(ground_equation_list,bike_equation_list,pcd_list,angle_list);
-%% 4. Classificazione 2 features: bici corsa/mountain bike
-
-postprocessing_functions.classification(path,results_filtered,pcd_list);
+%% 4. Show pcd split by kmeans
+% test 06, mtb, frame 21 -> per separare bici e ciclista
+% test01, mtb, frame 26 +
+index = 38;
+postprocessing_functions.split_pcd(pcd_list,index);
 %% 000. Extra: Show results bounding box in point cloud
-close all;
+
 lim = 0;
 postprocessing_functions.show_results(path,results_filtered,threshold,lim);
 %% 000: Extra: Mostrare pcd solo ciclista + bici
@@ -163,34 +165,116 @@ pts_sizes(pts_sizes == 0) = [];
 
 yyaxis left
 plot(distance_list, 'LineWidth', 1.5)
-ylabel('Distanza dal centro')
+ylabel('Distance','FontSize',30)
 
 yyaxis right
 plot(pts_sizes, 'LineWidth', 1.5)
-ylabel('Numero di punti')
+ylabel('Number of points','FontSize',30)
 
-xlabel('Tempo')
-title('Relazione distanza e numero di punti')
+xlabel('Frames','FontSize',30)
+title('Relationship between number of points and distance over frames')
 
-% 3. grafico velocità
-% Calcolo velocità media e massima
-figure (3)
-plot(speed_array, 'LineWidth', 1.5)
-ylabel('Speed (km/h)')
-xlabel('Frames')
-% aggiunta di linea che descrive meglio l'array di punti come curva
-% Aggiunta di una linea che descrive meglio l'array di punti come curva
+% --- 3 ---
+% 1. PULIZIA DATI
+% Creiamo una maschera che tiene solo i valori che NON sono NaN E NON sono Zero
+%% 1. PULIZIA DATI E CALCOLI
+valid_mask = ~isnan(speed_array) & (speed_array ~= 0);
+speed_clean = speed_array(valid_mask);
+
+distance_step_clean = distances(valid_mask);
+distance_cum = cumsum(distance_step_clean);
+
+window = 15;
+speed_trend = movmean(speed_clean, window);
+
+% 2. FIGURA 1 – VELOCITÀ
+figure('Name', 'Speed Analysis', 'Color', 'w');
 hold on;
-plot(smooth(speed_array), 'LineWidth', 2, 'Color', 'g');
-legend('Speed (km/h)', 'Smoothed Speed');
+
+plot(speed_clean, 'LineWidth', 1.5, 'Color', [0.6 0.7 1], ...
+    'DisplayName', 'Raw Speed');
+
+plot(speed_trend, 'LineWidth', 4, 'Color', [0 0.8 0], ...
+    'DisplayName', 'Smoothed Trend');
+
+ylabel('Speed (km/h)', 'FontSize', 30, 'FontWeight', 'bold');
+xlabel('Valid Samples', 'FontSize', 30, 'FontWeight', 'bold');
+
+ax = gca;
+ax.FontSize = 20;
+ax.LineWidth = 1.5;
+ax.FontWeight = 'bold';
+grid on;
+
+lgd = legend('show');
+lgd.FontSize = 24;
+lgd.Location = 'best';
+
+hold off;
+
+%  3. FIGURA 2 – DISTANZA CUMULATA
+figure('Name', 'Cumulative Distance', 'Color', 'w');
+hold on;
+
+plot(distance_cum, 'LineWidth', 3, 'Color', [1 0 0], ...
+    'DisplayName', 'Cumulative Distance');
+
+ylabel('Distance (m)', 'FontSize', 30, 'FontWeight', 'bold');
+xlabel('Valid Samples', 'FontSize', 30, 'FontWeight', 'bold');
+
+ax = gca;
+ax.FontSize = 20;
+ax.LineWidth = 1.5;
+ax.FontWeight = 'bold';
+grid on;
+
+lgd = legend('show');
+lgd.FontSize = 24;
+lgd.Location = 'best';
+
+hold off;
 
 %%
+close all;
+% remove 90 degrees lean angle list and NaN values and plot them
+close all;
 
-% remove NaN lean angle list values and plot them
-lean_angle_list = angle_list(~isnan(angle_list)); % Remove NaN values from angle list
+% 1. Filtra i dati (come prima)
+lean_angle_list = angle_list(~isnan(angle_list) & abs(angle_list) < 90); 
+
+% 2. Crea il vettore delle X (frames)
+frames = 1:length(lean_angle_list);
+
+% --- METODO: Media Mobile con funzione base ---
+span = 10; % Numero di punti su cui fare la media (più alto = più liscio)
+trend_curve = movmean(lean_angle_list, span); 
+
+% --- PLOT ---
 figure(4);
-plot(lean_angle_list, 'LineWidth', 1.5);
-ylabel('Lean Angle (degrees)');
-xlabel('Frames');
-title('Lean Angle Over Time');
+hold on;
+
+% A) Disegna i dati grezzi (Raw) in grigio chiaro
+plot(frames, lean_angle_list, ...
+    'Color', [0.7, 0.7, 0.7], ... 
+    'LineWidth', 1, ...
+    'LineStyle', '-', ...
+    'DisplayName', 'Raw Data');
+
+% B) Disegna la curva smussata (Trend) in rosso
+plot(frames, trend_curve, ...
+    'Color', 'r', ...             
+    'LineWidth', 2.5, ...         
+    'DisplayName', 'Smoothed Trend');
+
+hold off;
+
+% --- FORMATTAZIONE ---
+ylabel('Lean Angle (degrees)', 'FontSize', 30, 'FontWeight', 'bold');
+xlabel('Frames', 'FontSize', 30, 'FontWeight', 'bold');
+title('Lean Angle Analysis', 'FontSize', 30, 'FontWeight', 'bold');
 grid on;
+legend('show', 'FontSize', 24, 'Location', 'best');
+
+xlim([1, length(lean_angle_list)]);
+
+

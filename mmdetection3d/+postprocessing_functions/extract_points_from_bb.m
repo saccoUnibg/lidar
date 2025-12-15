@@ -18,7 +18,7 @@ function [pcd_list, pcd_traiettoria,center_list] = extract_points_from_bb(path,r
         % disp("Index: ");
         % disp(i);
         ptCloud = read(lidarData);
-        elevation_threshold = 0.05; % 5cm da terra
+        elevation_threshold = 0.02; % 5cm da terra
         ptCloud = removeInvalidPoints(ptCloud);
         [~,ptCloud,~] = segmentGroundSMRF(ptCloud,2,"ElevationThreshold",elevation_threshold);
 

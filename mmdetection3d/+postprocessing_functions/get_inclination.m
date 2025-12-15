@@ -162,12 +162,26 @@ function angle_list = evaluate_angle(ground_equation_list,bike_equation_list)
         for i = 1 : numFiles
             abcd_g = ground_equation_list(i,1:3);
             abcd_b = bike_equation_list(i,1:3);
+            
+            % evaluate angle between abcd_g and abcd_b planes
+            % 1. Estrai i vettori normali (i primi 3 elementi: a, b, c)
+            n_g = abcd_g(1:3);
+            n_b = abcd_b(1:3);
+            
+            % 2. Calcola il coseno dell'angolo usando il prodotto scalare
+            % La formula è: (n_g . n_b) / (|n_g| * |n_b|)
+            numerator = dot(n_g, n_b);
+            denominator = norm(n_g) * norm(n_b);
+            
+            % 3. Calcola l'angolo in gradi
+            % Usiamo 'abs' al numeratore per ottenere sempre l'angolo acuto (tra 0 e 90)
+            angle_between_planes = acosd(abs(numerator) / denominator);
 
             % ng = abcd_g / norm(abcd_g);
             % nb = abcd_b / norm(abcd_b);
 
-            alpha = atan2d(norm(cross(abcd_g, abcd_b)), abs(dot(abcd_g, abcd_b)));  % angolo tra le normali
-            theta = 90 - alpha; 
+            % alpha = atan2d(norm(cross(abcd_g, abcd_b)), abs(dot(abcd_g, abcd_b)));  % angolo tra le normali
+            theta = 90 - angle_between_planes; 
             angle_list(i) = theta;
         end
 end
@@ -186,12 +200,11 @@ end
 
 function bike_pcd = get_bike_pcd(pcd)
 % Restituisce:
-%   bike_pcd  : pointCloud con soli punti bici
-%   idx_remap : vettore Nx1 con etichette {1=bici, 2=rider} stabili
+%   bike_pcd  : pointCloud con soli punti bici (filtrata metà superiore)
+%   idx_remap : vettore Nx1 con etichette {1=bici, 2=rider} stabili (opzionale)
 
     P = pcd.Location;                % Nx3 (non organizzata)
     z = P(:,3);
-
     I = pcd.Intensity;
     if isempty(I), I = zeros(size(z)); end
     I = double(I(:));
@@ -209,17 +222,32 @@ function bike_pcd = get_bike_pcd(pcd)
     muZ = [mean(z(idx==1)), mean(z(idx==2))];
     [~, bikeLbl] = min(muZ);
     
-    % remove points on the half upper part
-    
-
-
     % RIMAPPA: bici -> 1, rider -> 2 (etichette stabili)
     idx_remap = ones(size(idx));
     idx_remap(idx ~= bikeLbl) = 2;
 
-    % Seleziona la bici
+    % Seleziona la bici (Step intermedio)
     bike_pcd = select(pcd, find(idx_remap == 1));
+    
+    % ---------------------------------------------------------
+    % OPERAZIONE FINALE: Rimuovi la metà superiore della bici
+    % ---------------------------------------------------------
+    % if ~isempty(bike_pcd.Location)
+    %     P_bike = bike_pcd.Location;
+    %     z_b = P_bike(:,3);
+    % 
+    %     % Calcolo la soglia geometrica (punto medio tra min e max Z)
+    %     z_min = min(z_b);
+    %     z_max = max(z_b);
+    %     z_threshold = (z_min + z_max) / 2;
+    % 
+    %     % Trovo gli indici dei punti che stanno SOTTO o uguali alla soglia
+    %     indices_lower = find(z_b <= z_threshold);
+    % 
+    %     % Sovrascrivo bike_pcd mantenendo solo la metà inferiore
+    %     bike_pcd = select(bike_pcd, indices_lower);
+    % end
+    
     % figure;
     % pcshow(bike_pcd,"ColorSource","Intensity","MarkerSize",20);
-
 end

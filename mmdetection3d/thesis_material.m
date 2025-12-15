@@ -30,6 +30,6 @@ for i = 1 : numFiles
     if i~=pcd_index
         continue
     end
-    extra_functions.show_pcd(pointCloud,"Point cloud ");
+    extra_functions.show_pcd(pointCloud,"Point cloud");
 end
 

@@ -39,43 +39,43 @@ function plot_pcd_ground_single(ground_equation_list, bike_equation_list, pcd_li
             else
                 zb = -(a*xg + b*yg + d) / c;
     
-                hBike = surf(ax, xg, yg, zb, ...
-                    'FaceAlpha', 0.45, ...
-                    'EdgeColor','none', ...
-                    'FaceColor',[0.85 0.33 0.10]); % arancio
+                %hBike = surf(ax, xg, yg, zb, ...
+                    % 'FaceAlpha', 0.45, ...
+                    % 'EdgeColor','none', ...
+                    % 'FaceColor',[0.85 0.33 0.10]); % arancio
             end
             
             % --- FORMATTAZIONE VISIVA ---
             
             % 1. Label Assi Grandi
-            xlabel('X [m]', 'FontSize', 20, 'FontWeight', 'bold');
-            ylabel('Y [m]', 'FontSize', 20, 'FontWeight', 'bold');
-            zlabel('Z [m]', 'FontSize', 20, 'FontWeight', 'bold');
+            xlabel('X [m]', 'FontSize', 24, 'FontWeight', 'bold');
+            ylabel('Y [m]', 'FontSize', 24, 'FontWeight', 'bold');
+            zlabel('Z [m]', 'FontSize', 24, 'FontWeight', 'bold');
             
             % 2. Titolo "Lean Angle"
             title(sprintf('Lean Angle: %.2f°', angle_list(i)), 'FontSize', 24, 'FontWeight', 'bold');
             
             % 3. Numeri sugli assi e impostazioni vista
-            ax.FontSize = 15; % Grandezza numeri sui tick
+            ax.FontSize = 10; % Grandezza numeri sui tick
             grid on; view(3); axis tight; daspect([1 1 1]);
             
             % Limiti Z dinamici (come nel tuo script originale)
             z_minimo = min(z_minimo, min(pts(:,3)) - 0.5);
             z_massimo = max(z_massimo, max(pts(:,3)));
-            zlim([z_minimo z_massimo]);
+            zlim([-1.5 z_massimo]);
             
             % 4. Legenda Grande
             L = ["Ground", "Bike"]; % Ho messo inglese per coerenza con "Lean Angle", rimetti "Terreno" se preferisci
-            H = [hGround, hBike];
+            %H = [hGround, hBike];
             
             % Rimuove handle vuoti se il piano bici non esiste
-            mask = ~arrayfun(@isempty, H);
-            H = H(mask);
-            L = L(mask);
+            mask = ~arrayfun(@isempty, L);
+            %H = H(mask);
+            %L = L(mask);
             
-            if ~isempty(H)
-                lgd = legend(H, L, 'Location', 'best');
-                lgd.FontSize = 18;      % <--- Legenda INGRANDITA
+            if ~isempty(L)
+                lgd = legend(L, 'Location', 'best');
+                lgd.FontSize = 40;      % <--- Legenda INGRANDITA
                 lgd.FontWeight = 'bold';
             end
             

@@ -48,9 +48,9 @@ function plot_pcd_ground_sequence(ground_equation_list, bike_equation_list, pcd_
             % --- FORMATTAZIONE VISIVA ---
             
             % 1. Label Assi Grandi e Nomi corretti
-            xlabel(ax, 'X [m]', 'FontSize', 20, 'FontWeight', 'bold');
-            ylabel(ax, 'Y [m]', 'FontSize', 20, 'FontWeight', 'bold');
-            zlabel(ax, 'Z [m]', 'FontSize', 20, 'FontWeight', 'bold');
+            xlabel(ax, 'X [m]', 'FontSize', 60, 'FontWeight', 'bold');
+            ylabel(ax, 'Y [m]', 'FontSize', 60, 'FontWeight', 'bold');
+            zlabel(ax, 'Z [m]', 'FontSize', 60, 'FontWeight', 'bold');
             
             % 2. Titolo Grande "Lean Angle"
             % Visualizza anche il numero del frame per riferimento
@@ -58,7 +58,7 @@ function plot_pcd_ground_sequence(ground_equation_list, bike_equation_list, pcd_
                   'FontSize', 24, 'FontWeight', 'bold');
             
             % 3. Numeri sugli assi e impostazioni vista
-            ax.FontSize = 15; 
+            ax.FontSize = 30; 
             grid(ax, 'on'); 
             view(ax, 3); 
             axis(ax, 'tight'); 
@@ -80,7 +80,7 @@ function plot_pcd_ground_sequence(ground_equation_list, bike_equation_list, pcd_
             
             if ~isempty(H)
                 lgd = legend(ax, H, L, 'Location','best');
-                lgd.FontSize = 18;      % <--- Legenda INGRANDITA
+                lgd.FontSize = 24;      % <--- Legenda INGRANDITA
                 lgd.FontWeight = 'bold';
             end
             
