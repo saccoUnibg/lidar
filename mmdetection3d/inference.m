@@ -23,7 +23,7 @@ cd('/Users/cristiansacco/workspaces/lidar/mmdetection3d')
 %   run_batch.py
 %% Scelta cartella di test da convertire
 % Mac:
-path_pcd = "/Users/cristiansacco/workspaces/lidar/tests/bici_corsa/test10";
+path_pcd = "/Users/cristiansacco/workspaces/lidar/tests/bikepark/test01";
 % Ubuntu:
 % path = "pcd_tests/test99";
 %% visualizzazione pcd cartella

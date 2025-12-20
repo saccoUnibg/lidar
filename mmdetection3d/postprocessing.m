@@ -13,10 +13,10 @@ root = '/Users/cristiansacco/workspaces/lidar/mmdetection3d';
 cd(root)
 clc;clear; close all;
 
-test = "12";
-bike_type = "bici_corsa";
+test = "38";
+%bike_type = "bici_corsa";
 %bike_type = "mtb";
-
+bike_type = "bikepark";
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 % --- Workspace + path ---
@@ -28,7 +28,7 @@ model = "second";
 root = '/Users/cristiansacco/workspaces/lidar/mmdetection3d';
 % Filter cyclists results
 close all;
-threshold = 0.2;
+threshold = 0.4;
 results_filtered = postprocessing_functions.filter_cyclist(results,model,threshold);
 % Estrazione punti interni alle bb + pcd traiettoria
 [pcd_list, pcd_traiettoria,center_list] = postprocessing_functions.extract_points_from_bb(path, results_filtered);
@@ -120,7 +120,7 @@ postprocessing_functions.plot_pcd_ground_sequence(ground_equation_list,bike_equa
 %% 4. Show pcd split by kmeans
 % test 06, mtb, frame 21 -> per separare bici e ciclista
 % test01, mtb, frame 26 +
-index = 38;
+index = 69;
 postprocessing_functions.split_pcd(pcd_list,index);
 %% 000. Extra: Show results bounding box in point cloud
 
